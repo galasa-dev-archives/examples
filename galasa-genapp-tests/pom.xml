@@ -105,6 +105,16 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>dev.galasa</groupId>
+			<artifactId>dev.galasa.zos.manager</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>dev.galasa</groupId>
+			<artifactId>dev.galasa.zos3270.manager</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<scope>provided</scope>
