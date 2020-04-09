@@ -32,8 +32,8 @@ public class GenAppTest {
                 .pf3().waitForTextInField("Sign-on is terminated").clear().waitForKeyboard()
                 .type("cesl").enter().waitForTextInField("Userid");
 
-        ICredentialsUsernamePassword creds = (ICredentialsUsernamePassword) coreManager.getCredentials("RICH98");
-        coreManager.registerConfidentialText(creds.getPassword(), "Rich98 password");
+        ICredentialsUsernamePassword creds = (ICredentialsUsernamePassword) coreManager.getCredentials("GENAPP");
+        coreManager.registerConfidentialText(creds.getPassword(), creds.getUsername() + " password");
 
         terminal.positionCursorToFieldContaining("Userid").tab()
                 .type(creds.getUsername())
