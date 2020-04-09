@@ -1,5 +1,7 @@
 package dev.galasa.genapp.tests;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dev.galasa.ICredentialsUsernamePassword;
 import dev.galasa.Test;
 import dev.galasa.core.manager.CoreManager;
@@ -12,7 +14,7 @@ import dev.galasa.zos3270.Zos3270Exception;
 import dev.galasa.zos3270.Zos3270Terminal;
 
 @Test
-public class GenAppTest {
+public class GenAppIVT {
 
     @CoreManager
     public ICoreManager coreManager;
@@ -27,14 +29,17 @@ public class GenAppTest {
 
     @Test
     public void login() throws InterruptedException, CoreManagerException, Zos3270Exception {
+        //Logon to the CICS Region
         terminal.waitForKeyboard().type("logon applid(" + APPLID + ")")
                 .enter().waitForTextInField("Userid")
                 .pf3().waitForTextInField("Sign-on is terminated").clear().waitForKeyboard()
                 .type("cesl").enter().waitForTextInField("Userid");
 
+        //Retrieve credentials from the Credentials Store and register password as confidential
         ICredentialsUsernamePassword creds = (ICredentialsUsernamePassword) coreManager.getCredentials("GENAPP");
         coreManager.registerConfidentialText(creds.getPassword(), creds.getUsername() + " password");
 
+        //Use the credentials to log in
         terminal.positionCursorToFieldContaining("Userid").tab()
                 .type(creds.getUsername())
                 .positionCursorToFieldContaining("Password").tab()
@@ -42,10 +47,13 @@ public class GenAppTest {
                 .enter().waitForKeyboard()
                 .clear().waitForKeyboard()
 
-                .type("ssc1").enter().waitForKeyboard()
-                .positionCursorToFieldContaining("Cust Number").tab()
-                .type("0000000013")
-                .positionCursorToFieldContaining("Select Option").tab()
-                .type("1").enter().waitForKeyboard();
+        //Open the GenApp application
+                .type("ssc1").enter().waitForKeyboard();
+
+        //Assert that the application menu is showing
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Customer Menu");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Cust Inquiry       Cust Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Cust Add           Cust Name :First");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("4. Cust Update        DOB");
     }
 }
