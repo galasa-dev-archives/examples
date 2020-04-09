@@ -52,7 +52,7 @@ public class BasicTest {
     @Test
     public void test() throws CoreManagerException, InterruptedException, Zos3270Exception,
             TestBundleResourceException, JsonSyntaxException, IOException, HttpClientException, URISyntaxException {
-        client.setURI(new URI("http://winmvs2c.hursley.ibm.com:23571"));
+        client.setURI(new URI("http://"+ image.getIpHost().getHostname() +":23571"));
         
         HashMap<String, Object> addParameters = new HashMap<String, Object>();
         String runId = coreManager.getRunName();
