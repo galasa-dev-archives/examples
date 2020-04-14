@@ -67,7 +67,7 @@ public class GenAppIVT {
 
     @Test
     public void motorPolicyGenApp() throws InterruptedException, CoreManagerException, Zos3270Exception {
-        //Open the GenApp customer application
+        //Open the GenApp Motor Policy application
         terminal.type("ssp1").enter().waitForKeyboard();
 
         //Assert that the application menu is showing
@@ -81,7 +81,7 @@ public class GenAppIVT {
 
     @Test
     public void endowmentPolicyGenApp() throws InterruptedException, CoreManagerException, Zos3270Exception {
-        //Open the GenApp customer application
+        //Open the GenApp Emdowment Policy application
         terminal.type("ssp2").enter().waitForKeyboard();
 
         //Assert that the application menu is showing
@@ -95,11 +95,11 @@ public class GenAppIVT {
 
     @Test
     public void housePolicyGenApp() throws InterruptedException, CoreManagerException, Zos3270Exception {
-        //Open the GenApp customer application
+        //Open the GenApp House Policy application
         terminal.type("ssp3").enter().waitForKeyboard();
 
         //Assert that the application menu is showing
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Endowment Policy Menu");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance House Policy Menu");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Policy Inquiry     Policy Number");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Policy Add         Cust Number");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("3. Policy Delete");
@@ -111,11 +111,11 @@ public class GenAppIVT {
 
     @Test
     public void commercialPolicyGenApp() throws InterruptedException, CoreManagerException, Zos3270Exception {
-        //Open the GenApp customer application
+        //Open the GenApp Commercial Policy application
         terminal.type("ssp4").enter().waitForKeyboard();
 
         //Assert that the application menu is showing
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Endowment Policy Menu");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Commercial Policy Menu");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Policy Inquiry     Policy Number");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Policy Add         Cust Name");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("3. Policy Delete      Cust Name");
