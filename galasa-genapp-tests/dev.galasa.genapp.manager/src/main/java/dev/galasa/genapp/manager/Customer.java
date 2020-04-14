@@ -11,13 +11,15 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 import dev.galasa.framework.spi.ValidAnnotatedFields;
-import dev.galasa.genapp.manager.IEndowmentPolicy;
+import dev.galasa.genapp.manager.ICustomer;
 import dev.galasa.genapp.manager.internal.GenAppManagerField;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD })
 @GenAppManagerField
-@ValidAnnotatedFields({ IEndowmentPolicy.class })
-public @interface EndowmentPolicy {
+@ValidAnnotatedFields({ ICustomer.class })
+public @interface Customer {
+
+    int userID() default 1;
 
 }

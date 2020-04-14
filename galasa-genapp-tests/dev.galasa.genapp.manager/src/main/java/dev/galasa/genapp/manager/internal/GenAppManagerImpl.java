@@ -19,8 +19,8 @@ import dev.galasa.framework.spi.IConfigurationPropertyStoreService;
 import dev.galasa.framework.spi.IFramework;
 import dev.galasa.framework.spi.IManager;
 import dev.galasa.framework.spi.ResourceUnavailableException;
-import dev.galasa.genapp.manager.Account;
 import dev.galasa.genapp.manager.CommercialPolicy;
+import dev.galasa.genapp.manager.Customer;
 import dev.galasa.genapp.manager.EndowmentPolicy;
 import dev.galasa.genapp.manager.GenApp;
 import dev.galasa.genapp.manager.GenAppManagerException;
@@ -44,6 +44,18 @@ import dev.galasa.zos3270.spi.IZos3270ManagerSpi;
 import dev.galasa.zos3270.spi.NetworkException;
 import dev.galasa.zos3270.spi.Zos3270TerminalImpl;
 
+/**
+ * General application manager implementation.
+ * 
+ * Extracting from the test class the 6 current annotations of @GenApp, @Customer, @CommercialPolicy, @EndowmentPolicy, @HousePolicy and @MotorPolicy
+ * 
+ * @GenApp - provides the actual environment that allows interaction with GenApp
+ * @Customer - provides an Customer that can actually be used through an existing ID or a newly created customer
+ * @CommercialPolicy - provides a CommercialPolicy in Genapp that can actually be used through an existing PolicyID or a newly created CommercialPolicy
+ * @EndowmentPolicy - provides a EndowmentPolicy in Genapp that can actually be used through an existing PolicyID or a newly created EndowmentPolicy
+ * @HousePolicy - provides a HousePolicy in Genapp that can actually be used through an existing PolicyID or a newly created CommercialPolicy
+ * @MotorPolicy - provides a MotorPolicy in Genapp that can actually be used through an existing PolicyID or a newly created MotorPolicy
+ */
 @Component(service = { IManager.class })
 public class GenAppManagerImpl extends AbstractManager implements IGenAppManager {
 
@@ -127,7 +139,7 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
         }
     }
 
-    @GenerateAnnotatedField(annotation = Account.class)
+    @GenerateAnnotatedField(annotation = Customer.class)
     public IGenApp generateAccount(Field field, List<Annotation> annotations) {
         return null; //TODO finish this
     }
