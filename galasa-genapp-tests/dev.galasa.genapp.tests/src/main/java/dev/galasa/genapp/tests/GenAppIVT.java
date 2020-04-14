@@ -28,7 +28,21 @@ public class GenAppIVT {
     final String APPLID = "CICPY01D";
 
     @Test
-    public void login() throws InterruptedException, CoreManagerException, Zos3270Exception {
+    public void customerGenAppTesting() throws InterruptedException, CoreManagerException, Zos3270Exception {
+        //Logging into the CICS-region of GenApp CB12
+        login();
+        //Open the GenApp application
+        terminal.type("ssc1").enter().waitForKeyboard();
+
+        //Assert that the application menu is showing
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Customer Menu");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Cust Inquiry       Cust Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Cust Add           Cust Name :First");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("4. Cust Update        DOB");
+    }
+
+    //Logging into the CICS-region with the provided CICS ID
+    private void login() throws InterruptedException, CoreManagerException, Zos3270Exception {
         //Logon to the CICS Region
         terminal.waitForKeyboard().type("logon applid(" + APPLID + ")")
                 .enter().waitForTextInField("Userid")
@@ -45,15 +59,6 @@ public class GenAppIVT {
                 .positionCursorToFieldContaining("Password").tab()
                 .type(creds.getPassword())
                 .enter().waitForKeyboard()
-                .clear().waitForKeyboard()
-
-        //Open the GenApp application
-                .type("ssc1").enter().waitForKeyboard();
-
-        //Assert that the application menu is showing
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Customer Menu");
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Cust Inquiry       Cust Number");
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Cust Add           Cust Name :First");
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("4. Cust Update        DOB");
+                .clear().waitForKeyboard();
     }
 }
