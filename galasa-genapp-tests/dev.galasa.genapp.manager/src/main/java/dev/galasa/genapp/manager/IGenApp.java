@@ -11,9 +11,9 @@ public interface IGenApp {
 
     public String getAddress();
 
-    public String getAddAccountPath();
+    public String getAddCustomerPath();
 
-    public String getInquireAccountPath();
+    public String getInquireCustomerPath();
 
     public String getAddMotorPolicyPath();
 

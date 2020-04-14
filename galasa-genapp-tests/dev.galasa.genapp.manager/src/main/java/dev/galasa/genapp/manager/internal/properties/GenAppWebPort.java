@@ -12,8 +12,9 @@ import dev.galasa.genapp.manager.GenAppManagerException;
 import javax.validation.constraints.NotNull;
 
 public class GenAppWebPort extends CpsProperties{
-    public static String get(@NotNull String instance)
+    public static int get(@NotNull String instance)
             throws ConfigurationPropertyStoreException, GenAppManagerException {
-        return getStringWithDefault(GenAppPropertiesSingleton.cps(), "12345", "instance", "web.port",instance);
+        String webport = getStringWithDefault(GenAppPropertiesSingleton.cps(), "12345", "instance", "webnet.port",instance);
+        return Integer.parseInt(webport);
     }
 }

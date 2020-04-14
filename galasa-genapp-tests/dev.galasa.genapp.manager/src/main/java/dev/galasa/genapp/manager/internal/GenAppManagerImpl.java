@@ -13,6 +13,7 @@ import org.osgi.service.component.annotations.Component;
 import dev.galasa.ManagerException;
 import dev.galasa.framework.spi.AbstractManager;
 import dev.galasa.framework.spi.AnnotatedField;
+import dev.galasa.framework.spi.ConfigurationPropertyStoreException;
 import dev.galasa.framework.spi.GenerateAnnotatedField;
 import dev.galasa.framework.spi.IConfigurationPropertyStoreService;
 import dev.galasa.framework.spi.IFramework;
@@ -27,22 +28,33 @@ import dev.galasa.genapp.manager.HousePolicy;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.genapp.manager.IGenAppManager;
 import dev.galasa.genapp.manager.MotorPolicy;
+import dev.galasa.genapp.manager.internal.properties.GenAppCicsApplID;
+import dev.galasa.genapp.manager.internal.properties.GenAppDseInstance;
 import dev.galasa.genapp.manager.internal.properties.GenAppPropertiesSingleton;
+import dev.galasa.genapp.manager.internal.properties.GenAppWebPort;
+import dev.galasa.genapp.manager.internal.properties.GenAppZosImage;
+import dev.galasa.ipnetwork.IpNetworkManagerException;
+import dev.galasa.zos.IZosImage;
 import dev.galasa.zos.IZosManager;
+import dev.galasa.zos.ZosManagerException;
 import dev.galasa.zos.spi.IZosManagerSpi;
 import dev.galasa.zos3270.IZos3270Manager;
+import dev.galasa.zos3270.Zos3270ManagerException;
 import dev.galasa.zos3270.spi.IZos3270ManagerSpi;
+import dev.galasa.zos3270.spi.NetworkException;
+import dev.galasa.zos3270.spi.Zos3270TerminalImpl;
 
 @Component(service = { IManager.class })
 public class GenAppManagerImpl extends AbstractManager implements IGenAppManager {
 
-    private static final Log                   logger        = LogFactory.getLog(GenAppManagerImpl.class);
+    private static final Log logger = LogFactory.getLog(GenAppManagerImpl.class);
 
-    public final static String                 NAMESPACE     = "genapp";
+    public final static String NAMESPACE = "genapp";
     private IConfigurationPropertyStoreService cps;
+    private IFramework framework;
 
-    private IZosManagerSpi                     zosManager;
-    private IZos3270ManagerSpi                 zos3270Manager;
+    private IZosManagerSpi zosManager;
+    private IZos3270ManagerSpi zos3270Manager;
 
     @Override
     public void initialise(@NotNull IFramework framework, @NotNull List<IManager> allManagers,
@@ -54,6 +66,7 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
         }
 
         try {
+            this.framework = framework;
             this.cps = framework.getConfigurationPropertyService(NAMESPACE);
             GenAppPropertiesSingleton.setCps(cps);
         } catch (Exception e) {
@@ -89,8 +102,29 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
     }
 
     @GenerateAnnotatedField(annotation = GenApp.class)
-    public IGenApp generateGenApp(Field field, List<Annotation> annotations) {
-        return null; //TODO finish this
+    public IGenApp generateGenApp(Field field, List<Annotation> annotations) throws GenAppManagerException {
+        try {
+            String dseInstance = GenAppDseInstance.get();
+
+            String applid = GenAppCicsApplID.get(dseInstance);
+            int webnetPort = GenAppWebPort.get(dseInstance);
+
+            String imageId = GenAppZosImage.get(dseInstance);
+            IZosImage image = zosManager.getUnmanagedImage(imageId);
+
+            String host = image.getIpHost().getIpv4Hostname();
+            int port = image.getIpHost().getTelnetPort();
+            Boolean tls = image.getIpHost().isTelnetPortTls();
+
+            Zos3270TerminalImpl terminal3270 = new Zos3270TerminalImpl("GenAppTerminal", host, port, tls, framework);
+            terminal3270.connect();
+
+            IGenApp genApp = new GenAppImpl(terminal3270, applid, webnetPort, image, framework);
+            return genApp;
+        } catch (Zos3270ManagerException | InterruptedException | IpNetworkManagerException | ZosManagerException
+                | ConfigurationPropertyStoreException | NetworkException e) {
+            throw new GenAppManagerException("Issue generating sources for GenApp instance", e);
+        }
     }
 
     @GenerateAnnotatedField(annotation = Account.class)
