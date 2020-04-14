@@ -47,8 +47,6 @@ public class GenAppIVT {
                 .type(creds.getPassword())
                 .enter().waitForKeyboard()
                 .clear().waitForKeyboard();
-
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("Sign-on is complete");
     }
     
     @Test
