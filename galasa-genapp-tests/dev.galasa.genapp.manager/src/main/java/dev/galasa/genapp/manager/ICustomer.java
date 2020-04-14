@@ -5,9 +5,9 @@
  */
 package dev.galasa.genapp.manager;
 
-public interface IAccount {
+public interface ICustomer {
 
-    public int getAccountNumber();
+    public int getCustomerNumber();
 
     public String getFirstName();
 
