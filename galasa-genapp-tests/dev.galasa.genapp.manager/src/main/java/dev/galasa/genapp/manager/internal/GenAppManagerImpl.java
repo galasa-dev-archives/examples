@@ -19,15 +19,11 @@ import dev.galasa.framework.spi.IConfigurationPropertyStoreService;
 import dev.galasa.framework.spi.IFramework;
 import dev.galasa.framework.spi.IManager;
 import dev.galasa.framework.spi.ResourceUnavailableException;
-import dev.galasa.genapp.manager.CommercialPolicy;
 import dev.galasa.genapp.manager.Customer;
-import dev.galasa.genapp.manager.EndowmentPolicy;
 import dev.galasa.genapp.manager.GenApp;
 import dev.galasa.genapp.manager.GenAppManagerException;
-import dev.galasa.genapp.manager.HousePolicy;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.genapp.manager.IGenAppManager;
-import dev.galasa.genapp.manager.MotorPolicy;
 import dev.galasa.genapp.manager.internal.properties.GenAppCicsApplID;
 import dev.galasa.genapp.manager.internal.properties.GenAppDseInstance;
 import dev.galasa.genapp.manager.internal.properties.GenAppPropertiesSingleton;
@@ -141,26 +137,6 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
 
     @GenerateAnnotatedField(annotation = Customer.class)
     public IGenApp generateAccount(Field field, List<Annotation> annotations) {
-        return null; //TODO finish this
-    }
-
-    @GenerateAnnotatedField(annotation = CommercialPolicy.class)
-    public IGenApp generateCommercialPolicy(Field field, List<Annotation> annotations) {
-        return null; //TODO finish this
-    }
-
-    @GenerateAnnotatedField(annotation = EndowmentPolicy.class)
-    public IGenApp generateEndowmentPolicy(Field field, List<Annotation> annotations) {
-        return null; //TODO finish this
-    }
-
-    @GenerateAnnotatedField(annotation = HousePolicy.class)
-    public IGenApp generateHousePolicy(Field field, List<Annotation> annotations) {
-        return null; //TODO finish this
-    }
-
-    @GenerateAnnotatedField(annotation = MotorPolicy.class)
-    public IGenApp generateMotorPolicy(Field field, List<Annotation> annotations) {
         return null; //TODO finish this
     }
     
