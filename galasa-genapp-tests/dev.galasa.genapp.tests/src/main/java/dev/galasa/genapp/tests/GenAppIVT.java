@@ -52,7 +52,7 @@ public class GenAppIVT {
     }
     
     @Test
-    public void customerGenAppTesting() throws InterruptedException, CoreManagerException, Zos3270Exception {
+    public void customerGenApp() throws InterruptedException, CoreManagerException, Zos3270Exception {
         //Open the GenApp customer application
         terminal.type("ssc1").enter().waitForKeyboard();
 
@@ -62,7 +62,7 @@ public class GenAppIVT {
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Cust Add           Cust Name :First");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("4. Cust Update        DOB");
 
-        terminal.pa3();
+        terminal.pf3().waitForKeyboard();
     }
 
     @Test
@@ -76,7 +76,7 @@ public class GenAppIVT {
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Policy Add         Cust Number");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("Car Make");
 
-        terminal.pa3().waitForKeyboard();
+        terminal.pf3().waitForKeyboard();
     }
 
     @Test
@@ -90,7 +90,7 @@ public class GenAppIVT {
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Policy Add         Cust Number");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("Fund Name");
 
-        terminal.pa3().waitForKeyboard();
+        terminal.pf3().waitForKeyboard();
     }
 
     @Test
@@ -106,7 +106,7 @@ public class GenAppIVT {
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("4. Policy Update");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("Property Type");
 
-        terminal.pa3().waitForKeyboard();
+        terminal.pf3().waitForKeyboard();
     }
 
     @Test
@@ -121,7 +121,7 @@ public class GenAppIVT {
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("3. Policy Delete      Cust Name");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("Status");
 
-        terminal.pa3().waitForKeyboard();
+        terminal.pf3().waitForKeyboard();
     }
 
     
