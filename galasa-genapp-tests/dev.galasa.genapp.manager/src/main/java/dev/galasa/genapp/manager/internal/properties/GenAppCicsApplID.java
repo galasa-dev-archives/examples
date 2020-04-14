@@ -11,9 +11,9 @@ import dev.galasa.genapp.manager.GenAppManagerException;
 
 import javax.validation.constraints.NotNull;
 
-public class GenAppCicsRegion extends CpsProperties{
+public class GenAppCicsApplID extends CpsProperties{
     public static String get(@NotNull String instance)
             throws ConfigurationPropertyStoreException, GenAppManagerException {
-        return getStringWithDefault(GenAppPropertiesSingleton.cps(), "CICPY01D", "instance", "cics.regionID",instance);
+        return getStringNulled(GenAppPropertiesSingleton.cps(), "instance", "cics.applID",instance);
     }
 }
