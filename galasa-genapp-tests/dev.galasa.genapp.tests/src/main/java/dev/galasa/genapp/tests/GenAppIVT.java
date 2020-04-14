@@ -117,8 +117,8 @@ public class GenAppIVT {
         //Assert that the application menu is showing
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Commercial Policy Menu");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Policy Inquiry     Policy Number");
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Policy Add         Cust Name");
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("3. Policy Delete      Cust Name");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Policy Add         Cust Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("3. Policy Delete");
         assertThat(terminal.retrieveScreen()).containsOnlyOnce("Status");
 
         terminal.pf3().waitForKeyboard();
