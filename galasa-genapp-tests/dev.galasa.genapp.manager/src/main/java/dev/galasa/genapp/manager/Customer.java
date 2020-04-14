@@ -20,6 +20,6 @@ import dev.galasa.genapp.manager.internal.GenAppManagerField;
 @ValidAnnotatedFields({ ICustomer.class })
 public @interface Customer {
 
-    int userID() default 1;
+    int userID() default 0;
 
 }

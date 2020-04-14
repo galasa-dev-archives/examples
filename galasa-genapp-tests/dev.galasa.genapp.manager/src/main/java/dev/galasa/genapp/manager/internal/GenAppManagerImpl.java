@@ -22,6 +22,7 @@ import dev.galasa.framework.spi.ResourceUnavailableException;
 import dev.galasa.genapp.manager.Customer;
 import dev.galasa.genapp.manager.GenApp;
 import dev.galasa.genapp.manager.GenAppManagerException;
+import dev.galasa.genapp.manager.ICustomer;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.genapp.manager.IGenAppManager;
 import dev.galasa.genapp.manager.internal.properties.GenAppCicsApplID;
@@ -63,6 +64,8 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
 
     private IZosManagerSpi zosManager;
     private IZos3270ManagerSpi zos3270Manager;
+
+    private GenAppImpl genapp;
 
     @Override
     public void initialise(@NotNull IFramework framework, @NotNull List<IManager> allManagers,
@@ -106,10 +109,23 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
 
     @Override
     public void provisionGenerate() throws ManagerException, ResourceUnavailableException {
+        List<AnnotatedField> foundAnnotatedFields = findAnnotatedFields(GenAppManagerField.class);
+        for (AnnotatedField annotatedField : foundAnnotatedFields) {
+            Field field = annotatedField.getField();
+            List<Annotation> annotations = annotatedField.getAnnotations();
+
+            if (field.getType() == IGenApp.class) {
+                GenApp annotation = field.getAnnotation(GenApp.class);
+                if (annotation != null) {
+                    IGenApp genapp = generateGenApp(field, annotations);
+                    registerAnnotatedField(field, genapp);
+                }
+            }
+        }
+
         generateAnnotatedFields(GenAppManagerField.class);
     }
 
-    @GenerateAnnotatedField(annotation = GenApp.class)
     public IGenApp generateGenApp(Field field, List<Annotation> annotations) throws GenAppManagerException {
         try {
             String dseInstance = GenAppDseInstance.get();
@@ -127,7 +143,8 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
             Zos3270TerminalImpl terminal3270 = new Zos3270TerminalImpl("GenAppTerminal", host, port, tls, framework);
             terminal3270.connect();
 
-            IGenApp genApp = new GenAppImpl(terminal3270, applid, webnetPort, image, framework);
+            GenAppImpl genApp = new GenAppImpl(terminal3270, applid, webnetPort, image, framework);
+            this.genapp = genApp;
             return genApp;
         } catch (Zos3270ManagerException | InterruptedException | IpNetworkManagerException | ZosManagerException
                 | ConfigurationPropertyStoreException | NetworkException e) {
@@ -136,8 +153,17 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
     }
 
     @GenerateAnnotatedField(annotation = Customer.class)
-    public IGenApp generateAccount(Field field, List<Annotation> annotations) {
-        return null; //TODO finish this
+    public ICustomer generateCustomer(Field field, List<Annotation> annotations) throws GenAppManagerException {
+        Customer custAnnotation = field.getAnnotation(Customer.class);
+        int customerId = custAnnotation.userID();
+        if(customerId != 0) {
+            ICustomer customer = this.genapp.inquireCustomer(customerId);
+            if(customer == null)
+                throw new GenAppManagerException("Customer with id " + customerId + " does not exist");
+            return customer;
+        } else {
+            return this.genapp.addCustomer();
+        }
     }
     
 }

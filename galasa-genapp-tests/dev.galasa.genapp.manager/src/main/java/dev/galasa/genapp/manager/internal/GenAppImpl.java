@@ -4,6 +4,7 @@ import dev.galasa.ICredentialsUsernamePassword;
 import dev.galasa.framework.spi.IConfidentialTextService;
 import dev.galasa.framework.spi.IFramework;
 import dev.galasa.genapp.manager.GenAppManagerException;
+import dev.galasa.genapp.manager.ICustomer;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.zos.IZosImage;
 import dev.galasa.zos.ZosManagerException;
@@ -109,20 +110,60 @@ public class GenAppImpl implements IGenApp {
         return this.PREFIX + "/" + this.getCommercial;
     }
 
+    public ICustomer inquireCustomer(int id) throws GenAppManagerException {
+        String defaultId = "0000000000";
+        String customerId = Integer.toString(id);
+
+        try {
+        terminal.waitForKeyboard()
+                .type("ssc1").enter().waitForKeyboard()
+                .positionCursorToFieldContaining("Cust Number").tab()
+                .type(defaultId.substring(0,defaultId.length()-customerId.length()) + customerId).enter().waitForKeyboard()
+                .positionCursorToFieldContaining("Select Option").tab()
+                .type("1").enter().waitForKeyboard();
+
+        if(terminal.retrieveScreen().contains("No data was returned."))
+            return null;
+
+        String firstName = terminal.retrieveFieldTextAfterFieldWithString("First");
+        String lastName = terminal.retrieveFieldTextAfterFieldWithString("Last");
+        String dob = terminal.retrieveFieldTextAfterFieldWithString("DOB");
+        String houseName = terminal.retrieveFieldTextAfterFieldWithString("House Name");
+        String houseNum = terminal.retrieveFieldTextAfterFieldWithString("House Number");
+        String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode");
+        String homePhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Home");
+        String mobPhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Mob");
+        String emailAddress = terminal.retrieveFieldTextAfterFieldWithString("Email  Addr");
+
+        ICustomer customer = new CustomerImpl(id, firstName, lastName, dob, houseName, 
+                                houseNum, postcode, homePhone, mobPhone, emailAddress);
+
+        terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+
+        return customer;
+        } catch(InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Inquiring Customer", e);
+        }
+    }
+
+    public ICustomer addCustomer() throws GenAppManagerException {
+        return inquireCustomer(1);
+    }
+
     private void logon() throws GenAppManagerException {
         try {
-            terminal.waitForKeyboard();
-            terminal.type("logon applid(" + this.applID + ")");
-            terminal.enter().waitForTextInField("Userid");
-            terminal.pf3().waitForTextInField("Sign-on is terminated");
-            terminal.clear().waitForKeyboard();
-			terminal.type("cesl").enter().waitForTextInField("Userid");
-			terminal.positionCursorToFieldContaining("Userid").tab();
-			terminal.type(creds.getUsername());
-			terminal.positionCursorToFieldContaining("Password").tab();
-			terminal.type(creds.getPassword());
-			terminal.enter().waitForKeyboard();
-			terminal.clear().waitForKeyboard();
+            terminal.waitForKeyboard()
+                    .type("logon applid(" + this.applID + ")")
+                    .enter().waitForTextInField("Userid")
+                    .pf3().waitForTextInField("Sign-on is terminated")
+                    .clear().waitForKeyboard()
+			        .type("cesl").enter().waitForTextInField("Userid")
+			        .positionCursorToFieldContaining("Userid").tab()
+			        .type(creds.getUsername())
+			        .positionCursorToFieldContaining("Password").tab()
+			        .type(creds.getPassword())
+			        .enter().waitForKeyboard()
+			        .clear().waitForKeyboard();
 		} catch (InterruptedException | Zos3270Exception e) {
 			throw new GenAppManagerException("Issue logging into GenApp", e);
 		}
