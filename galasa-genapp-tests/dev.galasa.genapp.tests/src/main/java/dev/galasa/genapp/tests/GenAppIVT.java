@@ -27,22 +27,9 @@ public class GenAppIVT {
 
     final String APPLID = "CICPY01D";
 
-    @Test
-    public void customerGenAppTesting() throws InterruptedException, CoreManagerException, Zos3270Exception {
-        //Logging into the CICS-region of GenApp CB12
-        login();
-        //Open the GenApp application
-        terminal.type("ssc1").enter().waitForKeyboard();
-
-        //Assert that the application menu is showing
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Customer Menu");
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Cust Inquiry       Cust Number");
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Cust Add           Cust Name :First");
-        assertThat(terminal.retrieveScreen()).containsOnlyOnce("4. Cust Update        DOB");
-    }
-
     //Logging into the CICS-region with the provided CICS ID
-    private void login() throws InterruptedException, CoreManagerException, Zos3270Exception {
+    @Test
+    public void login() throws InterruptedException, CoreManagerException, Zos3270Exception {
         //Logon to the CICS Region
         terminal.waitForKeyboard().type("logon applid(" + APPLID + ")")
                 .enter().waitForTextInField("Userid")
@@ -60,5 +47,82 @@ public class GenAppIVT {
                 .type(creds.getPassword())
                 .enter().waitForKeyboard()
                 .clear().waitForKeyboard();
+
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("Sign-on is complete");
     }
+    
+    @Test
+    public void customerGenAppTesting() throws InterruptedException, CoreManagerException, Zos3270Exception {
+        //Open the GenApp customer application
+        terminal.type("ssc1").enter().waitForKeyboard();
+
+        //Assert that the application menu is showing
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Customer Menu");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Cust Inquiry       Cust Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Cust Add           Cust Name :First");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("4. Cust Update        DOB");
+
+        terminal.pa3();
+    }
+
+    @Test
+    public void motorPolicyGenApp() throws InterruptedException, CoreManagerException, Zos3270Exception {
+        //Open the GenApp customer application
+        terminal.type("ssp1").enter().waitForKeyboard();
+
+        //Assert that the application menu is showing
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Motor Policy Menu");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Policy Inquiry     Policy Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Policy Add         Cust Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("Car Make");
+
+        terminal.pa3().waitForKeyboard();
+    }
+
+    @Test
+    public void endowmentPolicyGenApp() throws InterruptedException, CoreManagerException, Zos3270Exception {
+        //Open the GenApp customer application
+        terminal.type("ssp2").enter().waitForKeyboard();
+
+        //Assert that the application menu is showing
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Endowment Policy Menu");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Policy Inquiry     Policy Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Policy Add         Cust Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("Fund Name");
+
+        terminal.pa3().waitForKeyboard();
+    }
+
+    @Test
+    public void housePolicyGenApp() throws InterruptedException, CoreManagerException, Zos3270Exception {
+        //Open the GenApp customer application
+        terminal.type("ssp3").enter().waitForKeyboard();
+
+        //Assert that the application menu is showing
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Endowment Policy Menu");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Policy Inquiry     Policy Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Policy Add         Cust Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("3. Policy Delete");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("4. Policy Update");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("Property Type");
+
+        terminal.pa3().waitForKeyboard();
+    }
+
+    @Test
+    public void commercialPolicyGenApp() throws InterruptedException, CoreManagerException, Zos3270Exception {
+        //Open the GenApp customer application
+        terminal.type("ssp4").enter().waitForKeyboard();
+
+        //Assert that the application menu is showing
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("General Insurance Endowment Policy Menu");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("1. Policy Inquiry     Policy Number");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("2. Policy Add         Cust Name");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("3. Policy Delete      Cust Name");
+        assertThat(terminal.retrieveScreen()).containsOnlyOnce("Status");
+
+        terminal.pa3().waitForKeyboard();
+    }
+
+    
 }
