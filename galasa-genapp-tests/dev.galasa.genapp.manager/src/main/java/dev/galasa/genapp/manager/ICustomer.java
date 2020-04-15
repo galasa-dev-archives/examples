@@ -29,22 +29,22 @@ public interface ICustomer {
 
     public void updateCustomerNumber(int customerNumber);
 
-    public void updateFirstName(String firstName);
+    public void updateFirstName(String firstName) throws GenAppManagerException;
 
-    public void updateLastName(String lastName);
+    public void updateLastName(String lastName) throws GenAppManagerException;
 
-    public void updateDateOfBirth(String dateOfBirth);
+    public void updateDateOfBirth(String dateOfBirth) throws GenAppManagerException;
 
-    public void updateHouseName(String houseName);
+    public void updateHouseName(String houseName) throws GenAppManagerException;
 
-    public void updateHouseNumber(String houseNumber);
+    public void updateHouseNumber(String houseNumber) throws GenAppManagerException;
 
-    public void updatePostCode(String postCode);
+    public void updatePostCode(String postCode) throws GenAppManagerException;
 
-    public void updateHomePhone(String homePhone);
+    public void updateHomePhone(String homePhone) throws GenAppManagerException;
 
-    public void updateMobilePhone(String mobilePhone);
+    public void updateMobilePhone(String mobilePhone) throws GenAppManagerException;
 
-    public void updateEmailAddress(String emailAddress);
+    public void updateEmailAddress(String emailAddress) throws GenAppManagerException;
 
 }

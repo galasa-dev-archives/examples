@@ -1,5 +1,6 @@
 package dev.galasa.genapp.manager.internal;
 
+import dev.galasa.genapp.manager.GenAppManagerException;
 import dev.galasa.genapp.manager.ICustomer;
 
 public class CustomerImpl implements ICustomer {
@@ -17,9 +18,9 @@ public class CustomerImpl implements ICustomer {
     private String mobilePhone;
     private String emailAddress;
 
-    public CustomerImpl(GenAppImpl genapp, int customerNumber, String firstName, String lastName,
-            String dateOfBirth, String houseName, String houseNumber, String postcode,
-            String homePhone, String mobilePhone, String emailAddress) {
+    public CustomerImpl(GenAppImpl genapp, int customerNumber, String firstName, String lastName, String dateOfBirth,
+            String houseName, String houseNumber, String postcode, String homePhone, String mobilePhone,
+            String emailAddress) {
         this.genApp = genapp;
         this.customerNumber = customerNumber;
         this.firstName = firstName;
@@ -94,49 +95,57 @@ public class CustomerImpl implements ICustomer {
     }
 
     @Override
-    public void updateFirstName(String firstName) {
+    public void updateFirstName(String firstName) throws GenAppManagerException {
         this.firstName = firstName;
-        genApp.updateCustomer(this, "First");
+        genApp.updateCustomer(this, "First",firstName);
     }
 
     @Override
-    public void updateLastName(String lastName) {
-        
+    public void updateLastName(String lastName) throws GenAppManagerException {
+        this.lastName = lastName;
+        genApp.updateCustomer(this, "Last",lastName);
     }
 
     @Override
-    public void updateDateOfBirth(String dateOfBirth) {
-        
+    public void updateDateOfBirth(String dateOfBirth) throws GenAppManagerException {
+        this.dateOfBirth = dateOfBirth;
+        genApp.updateCustomer(this, "DOB",dateOfBirth);
     }
 
     @Override
-    public void updateHouseName(String houseName) {
-        
+    public void updateHouseName(String houseName) throws GenAppManagerException {
+        this.houseName = houseName;
+        genApp.updateCustomer(this, "House Name",houseName);
     }
 
     @Override
-    public void updateHouseNumber(String houseNumber) {
-        
+    public void updateHouseNumber(String houseNumber) throws GenAppManagerException {
+        this.houseNumber = houseNumber;
+        genApp.updateCustomer(this, "House Number",houseNumber);
     }
 
     @Override
-    public void updatePostCode(String postCode) {
-        
+    public void updatePostCode(String postcode) throws GenAppManagerException {
+        this.postcode = postcode;
+        genApp.updateCustomer(this, "Postcode",postcode);
     }
 
     @Override
-    public void updateHomePhone(String homePhone) {
-        
+    public void updateHomePhone(String homePhone) throws GenAppManagerException {
+        this.homePhone = homePhone;
+        genApp.updateCustomer(this, "Phone: Home",homePhone);
     }
 
     @Override
-    public void updateMobilePhone(String mobilePhone) {
-        
+    public void updateMobilePhone(String mobilePhone) throws GenAppManagerException {
+        this.mobilePhone = mobilePhone;
+        genApp.updateCustomer(this, "Phone: Mob",mobilePhone);
     }
 
     @Override
-    public void updateEmailAddress(String emailAddress) {
-        
+    public void updateEmailAddress(String emailAddress) throws GenAppManagerException {
+        this.emailAddress = emailAddress;
+        genApp.updateCustomer(this, "Email  Addr",emailAddress);
     }
 
 }
