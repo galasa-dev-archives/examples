@@ -119,7 +119,6 @@ public class ProvisionedTest {
     }
 
     private void storeOutput(String folder, String file, String content) throws IOException {
-        // Store the xml request in the test results archive
         Path requestPath = artifactRoot.resolve(folder).resolve(file);
         Files.write(requestPath, content.getBytes(), new SetContentType(ResultArchiveStoreContentType.TEXT),
                 StandardOpenOption.CREATE);

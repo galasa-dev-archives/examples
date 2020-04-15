@@ -12,6 +12,8 @@ import dev.galasa.Test;
 import dev.galasa.core.manager.CoreManager;
 import dev.galasa.core.manager.CoreManagerException;
 import dev.galasa.core.manager.ICoreManager;
+import dev.galasa.genapp.manager.BasicGenApp;
+import dev.galasa.genapp.manager.IBasicGenApp;
 import dev.galasa.zos.IZosImage;
 import dev.galasa.zos.ZosImage;
 import dev.galasa.zos3270.ITerminal;
@@ -30,13 +32,14 @@ public class GenAppIVT {
     @Zos3270Terminal(imageTag = "GENAPP")
     public ITerminal terminal;
 
-    final String APPLID = "CICPY01D";
+    @BasicGenApp
+    public IBasicGenApp genapp;
 
     //Logging into the CICS-region with the provided CICS ID
     @Test
     public void login() throws InterruptedException, CoreManagerException, Zos3270Exception {
         //Logon to the CICS Region
-        terminal.waitForKeyboard().type("logon applid(" + APPLID + ")")
+        terminal.waitForKeyboard().type("logon applid(" + genapp.getApplId() + ")")
                 .enter().waitForTextInField("Userid")
                 .pf3().waitForTextInField("Sign-on is terminated").clear().waitForKeyboard()
                 .type("cesl").enter().waitForTextInField("Userid");
