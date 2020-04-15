@@ -8,8 +8,13 @@ import dev.galasa.genapp.manager.ICustomer;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.zos.IZosImage;
 import dev.galasa.zos.ZosManagerException;
+import dev.galasa.zos3270.FieldNotFoundException;
 import dev.galasa.zos3270.ITerminal;
+import dev.galasa.zos3270.KeyboardLockedException;
+import dev.galasa.zos3270.TextNotFoundException;
+import dev.galasa.zos3270.TimeoutException;
 import dev.galasa.zos3270.Zos3270Exception;
+import dev.galasa.zos3270.spi.NetworkException;
 
 public class GenAppImpl implements IGenApp {
 
@@ -115,49 +120,47 @@ public class GenAppImpl implements IGenApp {
         String customerId = Integer.toString(id);
 
         try {
-        terminal.waitForKeyboard()
-                .type("ssc1").enter().waitForKeyboard()
-                .positionCursorToFieldContaining("Cust Number").tab()
-                .type(defaultId.substring(0,defaultId.length()-customerId.length()) + customerId).enter().waitForKeyboard()
-                .positionCursorToFieldContaining("Select Option").tab()
-                .type("1").enter().waitForKeyboard();
+            terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId).enter()
+                    .waitForKeyboard().positionCursorToFieldContaining("Select Option").tab().type("1").enter()
+                    .waitForKeyboard();
 
-        if(terminal.retrieveScreen().contains("No data was returned."))
-            return null;
+            if (terminal.retrieveScreen().contains("No data was returned."))
+                return null;
 
-        String firstName = terminal.retrieveFieldTextAfterFieldWithString("First");
-        String lastName = terminal.retrieveFieldTextAfterFieldWithString("Last");
-        String dob = terminal.retrieveFieldTextAfterFieldWithString("DOB");
-        String houseName = terminal.retrieveFieldTextAfterFieldWithString("House Name");
-        String houseNum = terminal.retrieveFieldTextAfterFieldWithString("House Number");
-        String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode");
-        String homePhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Home");
-        String mobPhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Mob");
-        String emailAddress = terminal.retrieveFieldTextAfterFieldWithString("Email  Addr");
+            String firstName = terminal.retrieveFieldTextAfterFieldWithString("First");
+            String lastName = terminal.retrieveFieldTextAfterFieldWithString("Last");
+            String dob = terminal.retrieveFieldTextAfterFieldWithString("DOB");
+            String houseName = terminal.retrieveFieldTextAfterFieldWithString("House Name");
+            String houseNum = terminal.retrieveFieldTextAfterFieldWithString("House Number");
+            String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode");
+            String homePhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Home");
+            String mobPhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Mob");
+            String emailAddress = terminal.retrieveFieldTextAfterFieldWithString("Email  Addr");
 
-        ICustomer customer = new CustomerImpl(id, firstName, lastName, dob, houseName, 
-                                houseNum, postcode, homePhone, mobPhone, emailAddress);
+            ICustomer customer = new CustomerImpl(this, id, firstName, lastName, dob, houseName, houseNum, postcode,
+                    homePhone, mobPhone, emailAddress);
 
-        terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
-        return customer;
-        } catch(InterruptedException | Zos3270Exception e) {
+            return customer;
+        } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Customer", e);
         }
     }
 
     public ICustomer addCustomer() throws GenAppManagerException {
-        terminal.waitForKeyboard()
-                .type("ssc1").enter().waitForKeyboard()
-                .positionCursorToFieldContaining("Select Option").tab()
-                .type("2").enter().waitForKeyboard();
-    }
+        try {
+            terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
 
-    public void updateCustomer(ICustomer customer, String field) {
-        terminal.waitForKeyboard()
-                .type("ssc1").enter().waitForKeyboard()
-                .positionCursorToFieldContaining("Select Option").tab()
-                .type("4").enter().waitForKeyboard();
+            String customerNum = terminal.retrieveFieldTextAfterFieldWithString("Cust Number");
+
+            return new CustomerImpl(this, Integer.parseInt(customerNum), "", "", "", "", "", "", "", "", "");
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Inquiring Customer", e);
+        }
     }
 
     private void logon() throws GenAppManagerException {

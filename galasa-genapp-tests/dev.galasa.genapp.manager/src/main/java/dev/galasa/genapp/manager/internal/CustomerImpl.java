@@ -4,7 +4,9 @@ import dev.galasa.genapp.manager.ICustomer;
 
 public class CustomerImpl implements ICustomer {
 
-    private int customerNumber;
+    private GenAppImpl genApp;
+
+    private final int customerNumber;
     private String firstName;
     private String lastName;
     private String dateOfBirth;
@@ -15,12 +17,10 @@ public class CustomerImpl implements ICustomer {
     private String mobilePhone;
     private String emailAddress;
 
-    private GenAppImpl genAppImpl;
-
-    public CustomerImpl(GenAppImpl genAppImpl, int customerNumber, String firstName, String lastName,
+    public CustomerImpl(GenAppImpl genapp, int customerNumber, String firstName, String lastName,
             String dateOfBirth, String houseName, String houseNumber, String postcode,
             String homePhone, String mobilePhone, String emailAddress) {
-        this.genAppImpl = genAppImpl;
+        this.genApp = genapp;
         this.customerNumber = customerNumber;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -93,55 +93,50 @@ public class CustomerImpl implements ICustomer {
         return null;
     }
 
-    
-    private int setCustomerNumber() {
-        // TODO Auto-generated method stub
-        return 0;
+    @Override
+    public void updateFirstName(String firstName) {
+        this.firstName = firstName;
+        genApp.updateCustomer(this, "First");
     }
 
-    private String setFirstName() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override
+    public void updateLastName(String lastName) {
+        
     }
 
-    private String setLastName() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override
+    public void updateDateOfBirth(String dateOfBirth) {
+        
     }
 
-    private String setDateOfBirth() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override
+    public void updateHouseName(String houseName) {
+        
     }
 
-    private String setHouseName() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override
+    public void updateHouseNumber(String houseNumber) {
+        
     }
 
-    private String setHouseNumber() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override
+    public void updatePostCode(String postCode) {
+        
     }
 
-    private String setPostCode() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override
+    public void updateHomePhone(String homePhone) {
+        
     }
 
-    private String setHomePhone() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override
+    public void updateMobilePhone(String mobilePhone) {
+        
     }
 
-    private String setMobilePhone() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    private String setEmailAddress() {
-        // TODO Auto-generated method stub
-        return null;
+    @Override
+    public void updateEmailAddress(String emailAddress) {
+        
     }
 
 }
