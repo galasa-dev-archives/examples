@@ -66,10 +66,10 @@ public class BasicTest {
     public void test() throws CoreManagerException, InterruptedException, Zos3270Exception, TestBundleResourceException,
             JsonSyntaxException, IOException, HttpClientException, URISyntaxException {
         // Coupling the URI of GenApp to this instance of the Http-client
-        client.setURI(new URI("http://" + image.getIpHost().getHostname() + ":23571"));
+        client.setURI(new URI("http://" + genApp.getBaseAddress() + ":" + genApp.getWebnetPort()));
 
         HashMap<String, Object> addParameters = new HashMap<String, Object>();
-        HashMap<String, Object> InquireParameters = new HashMap<String, Object>();
+        HashMap<String, Object> inquireParameters = new HashMap<String, Object>();
         String runId = coreManager.getRunName();
         String defaultId = "0000000000";
 
@@ -84,9 +84,9 @@ public class BasicTest {
 
         // Inquiring about the added customer using the exposed http-ports of the
         // CICS-region that has GenApp running
-        InquireParameters.put("NUM", customerId);
+        inquireParameters.put("NUM", customerId);
         InputStream inquireIs = bundleResources.retrieveSkeletonFile("resources/skeletons/customerInquire.skel",
-                InquireParameters);
+                inquireParameters);
         JsonObject customerInquireJson = new Gson().fromJson(bundleResources.streamAsString(inquireIs),
                 JsonObject.class);
         JsonObject inquireResponseBody = client.postJson("GENAPP/getCustomerDetails", customerInquireJson).getContent();

@@ -4,4 +4,8 @@ public interface IBasicGenApp {
 
     public String getApplId();
 
+    public String getBaseAddress();
+
+    public int getWebnetPort();
+
 }

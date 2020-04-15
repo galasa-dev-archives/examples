@@ -27,8 +27,6 @@ public interface ICustomer {
 
     public String getEmailAddress();
 
-    public void updateCustomerNumber(int customerNumber);
-
     public void updateFirstName(String firstName) throws GenAppManagerException;
 
     public void updateLastName(String lastName) throws GenAppManagerException;

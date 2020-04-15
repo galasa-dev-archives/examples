@@ -160,8 +160,16 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
         try {
             dseInstance = GenAppDseInstance.get();
             String applid = GenAppCicsApplID.get(dseInstance);
-            return new BasicGenAppimpl(applid);
-        } catch (ConfigurationPropertyStoreException | GenAppManagerException e) {
+
+            int webnetPort = GenAppWebPort.get(dseInstance);
+
+            String imageId = GenAppZosImage.get(dseInstance);
+            IZosImage image = zosManager.getUnmanagedImage(imageId);
+
+            String host = image.getIpHost().getIpv4Hostname();
+
+            return new BasicGenAppimpl(applid, host, webnetPort);
+        } catch (ConfigurationPropertyStoreException | GenAppManagerException | ZosManagerException e) {
             throw new GenAppManagerException("Issue creating Basic GenApp Instance", e);
         }
     }

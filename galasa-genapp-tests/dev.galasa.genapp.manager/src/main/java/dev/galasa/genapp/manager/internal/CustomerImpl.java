@@ -36,62 +36,52 @@ public class CustomerImpl implements ICustomer {
 
     @Override
     public int getCustomerNumber() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.customerNumber;
     }
 
     @Override
     public String getFirstName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.firstName;
     }
 
     @Override
     public String getLastName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.lastName;
     }
 
     @Override
     public String getDateOfBirth() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.dateOfBirth;
     }
 
     @Override
     public String getHouseName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.houseName;
     }
 
     @Override
     public String getHouseNumber() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.houseNumber;
     }
 
     @Override
     public String getPostCode() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.postcode;
     }
 
     @Override
     public String getHomePhone() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.homePhone;
     }
 
     @Override
     public String getMobilePhone() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.mobilePhone;
     }
 
     @Override
     public String getEmailAddress() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.emailAddress;
     }
 
     @Override

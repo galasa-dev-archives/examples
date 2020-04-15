@@ -66,6 +66,11 @@ public class GenAppImpl implements IGenApp {
     }
 
     @Override
+    public int getWebnetPort() {
+        return this.webnet;
+    }
+
+    @Override
     public String getAddCustomerPath() {
         return this.PREFIX + "/" + this.addCustomer;
     }
@@ -129,15 +134,15 @@ public class GenAppImpl implements IGenApp {
             if (terminal.retrieveScreen().contains("No data was returned."))
                 return null;
 
-            String firstName = terminal.retrieveFieldTextAfterFieldWithString("First");
-            String lastName = terminal.retrieveFieldTextAfterFieldWithString("Last");
-            String dob = terminal.retrieveFieldTextAfterFieldWithString("DOB");
-            String houseName = terminal.retrieveFieldTextAfterFieldWithString("House Name");
-            String houseNum = terminal.retrieveFieldTextAfterFieldWithString("House Number");
-            String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode");
-            String homePhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Home");
-            String mobPhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Mob");
-            String emailAddress = terminal.retrieveFieldTextAfterFieldWithString("Email  Addr");
+            String firstName = terminal.retrieveFieldTextAfterFieldWithString("First").trim();
+            String lastName = terminal.retrieveFieldTextAfterFieldWithString("Last").trim();
+            String dob = terminal.retrieveFieldTextAfterFieldWithString("DOB").trim();
+            String houseName = terminal.retrieveFieldTextAfterFieldWithString("House Name").trim();
+            String houseNum = terminal.retrieveFieldTextAfterFieldWithString("House Number").trim();
+            String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode").trim();
+            String homePhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Home").trim();
+            String mobPhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Mob").trim();
+            String emailAddress = terminal.retrieveFieldTextAfterFieldWithString("Email  Addr").trim();
 
             ICustomer customer = new CustomerImpl(this, id, firstName, lastName, dob, houseName, houseNum, postcode,
                     homePhone, mobPhone, emailAddress);
@@ -166,15 +171,25 @@ public class GenAppImpl implements IGenApp {
     public ICustomer updateCustomer(ICustomer customer, String field, String value) throws GenAppManagerException {
         try {
             String defaultId = "0000000000";
+            String defaultValue = "          ";
 
             String customerId = Integer.toString(customer.getCustomerNumber());
 
             terminal.positionCursorToFieldContaining("Cust Number").tab()
-                .type(defaultId.substring(0,defaultId.length()-customerId.length()) + customerId)
-                .positionCursorToFieldContaining("Select Option").tab()
-                .type("4").enter().waitForKeyboard()
-                .positionCursorToFieldContaining(field).tab()
-                .type(value).enter().waitForKeyboard();
+                    .type(defaultId.substring(0,defaultId.length()-customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Select Option").tab()
+                    .type("4").enter().waitForKeyboard();
+
+            int fieldLength = terminal.retrieveFieldTextAfterFieldWithString(field).length();
+            if(value.length() > fieldLength)
+                throw new GenAppManagerException("Value " + value + " too long for field " + field + ". Must be " + fieldLength + " or fewer characters");
+
+            String extendedValue = value + defaultValue.substring(value.length(), fieldLength);
+            
+            terminal.positionCursorToFieldContaining(field).tab()
+                    .type(extendedValue).enter().waitForKeyboard();
+
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
             return inquireCustomer(customer.getCustomerNumber());
             

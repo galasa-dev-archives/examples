@@ -18,6 +18,16 @@ public interface IGenApp {
     public String getAddress();
 
     /**
+     * Refers to the port that the http-client will contact
+     */
+    public int getWebnetPort();
+
+    /**
+     * Return an ICustomer object of a given ID
+     */
+    public ICustomer inquireCustomer(int id) throws GenAppManagerException;
+
+    /**
      * The additional path for getAddCustomerPath
      */
     public String getAddCustomerPath();
