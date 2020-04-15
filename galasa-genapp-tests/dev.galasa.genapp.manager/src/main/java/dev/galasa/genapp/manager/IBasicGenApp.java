@@ -6,6 +6,6 @@ public interface IBasicGenApp {
 
     public String getBaseAddress();
 
-    public int getWebnetPort();
+    public String provisionCustomerName();
 
 }

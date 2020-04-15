@@ -66,16 +66,16 @@ public class BasicTest {
     public void test() throws CoreManagerException, InterruptedException, Zos3270Exception, TestBundleResourceException,
             JsonSyntaxException, IOException, HttpClientException, URISyntaxException {
         // Coupling the URI of GenApp to this instance of the Http-client
-        client.setURI(new URI("http://" + genApp.getBaseAddress() + ":" + genApp.getWebnetPort()));
+        client.setURI(new URI(genApp.getBaseAddress()));
 
         HashMap<String, Object> addParameters = new HashMap<String, Object>();
         HashMap<String, Object> inquireParameters = new HashMap<String, Object>();
-        String runId = coreManager.getRunName();
+        String provisionedName = genApp.provisionCustomerName();
         String defaultId = "0000000000";
 
         // Adding a customer using the exposed http-ports of the CICS-region that has
         // GenApp running
-        addParameters.put("ID", runId);
+        addParameters.put("ID", provisionedName);
         InputStream addIs = bundleResources.retrieveSkeletonFile("resources/skeletons/customerAdd.skel", addParameters);
         JsonObject customerAddJson = new Gson().fromJson(bundleResources.streamAsString(addIs), JsonObject.class);
         JsonObject addResponseBody = client.postJson("GENAPP/addCustomerDetails", customerAddJson).getContent();
@@ -94,31 +94,31 @@ public class BasicTest {
                 .getAsJsonObject();
 
         // Ensuring that the http-response actually contains user as requested
-        assertThat(ca.get("ca_first_name").getAsString()).isEqualTo("Test" + runId);
-        assertThat(ca.get("ca_last_name").getAsString()).isEqualTo("Case" + runId);
+        assertThat(ca.get("ca_first_name").getAsString()).isEqualTo(provisionedName);
+        assertThat(ca.get("ca_last_name").getAsString()).isEqualTo(provisionedName);
 
         // Ensuring that the added customer is also available through 3270-terminal
         loginToSCC1();
 
         inquireCustomer(customerId);
 
-        assertThat(terminal.retrieveScreen()).contains("Test" + runId);
-        assertThat(terminal.retrieveScreen()).contains("Case" + runId);
+        assertThat(terminal.retrieveScreen()).contains(provisionedName);
+
+        String updateProvisionedName = genApp.provisionCustomerName();
 
         terminal.positionCursorToFieldContaining("Cust Number").tab()
                 .type(defaultId.substring(0,defaultId.length()-customerId.length()) + customerId)
                 .positionCursorToFieldContaining("Select Option").tab()
                 .type("4").enter().waitForKeyboard()
                 .positionCursorToFieldContaining("First").tab()
-                .type("Update" + runId)
+                .type(updateProvisionedName)
                 .positionCursorToFieldContaining("Last").tab()
-                .type("UCase" + runId)
+                .type(updateProvisionedName)
                 .enter().waitForKeyboard();
 
         inquireCustomer(customerId);
 
-        assertThat(terminal.retrieveScreen()).contains("Update" + runId);
-        assertThat(terminal.retrieveScreen()).contains("UCase" + runId);
+        assertThat(terminal.retrieveScreen()).contains(updateProvisionedName);
     }
 
     private void loginToSCC1() throws InterruptedException, CoreManagerException, Zos3270Exception {

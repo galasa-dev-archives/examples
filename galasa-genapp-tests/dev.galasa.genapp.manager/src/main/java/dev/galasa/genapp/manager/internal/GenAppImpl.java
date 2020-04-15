@@ -1,5 +1,8 @@
 package dev.galasa.genapp.manager.internal;
 
+import java.nio.charset.Charset;
+import java.util.Random;
+
 import dev.galasa.ICredentialsUsernamePassword;
 import dev.galasa.framework.spi.IConfidentialTextService;
 import dev.galasa.framework.spi.IFramework;
@@ -8,20 +11,15 @@ import dev.galasa.genapp.manager.ICustomer;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.zos.IZosImage;
 import dev.galasa.zos.ZosManagerException;
-import dev.galasa.zos3270.FieldNotFoundException;
 import dev.galasa.zos3270.ITerminal;
-import dev.galasa.zos3270.KeyboardLockedException;
-import dev.galasa.zos3270.TextNotFoundException;
-import dev.galasa.zos3270.TimeoutException;
 import dev.galasa.zos3270.Zos3270Exception;
-import dev.galasa.zos3270.spi.NetworkException;
 
 public class GenAppImpl implements IGenApp {
 
     private ITerminal terminal;
     private String applID;
-    private int webnet;
-    private String baseAddress;
+    private int port;
+    private String hostAddress;
     private ICredentialsUsernamePassword creds;
 
     private final String PREFIX = "GENAPP";
@@ -40,13 +38,13 @@ public class GenAppImpl implements IGenApp {
     private final String getMotor = "getMotorPolicyDetails";
     private final String addMotor = "addMotorPolicyDetails";
 
-    public GenAppImpl(ITerminal terminal3270, String applid, int webnetPort, IZosImage image, IFramework framework)
+    public GenAppImpl(ITerminal terminal3270, String applid, int port, IZosImage image, IFramework framework)
             throws GenAppManagerException {
         try {
             this.applID = applid;
-            this.webnet = webnetPort;
+            this.port = port;
             this.terminal = terminal3270;
-            this.baseAddress = image.getIpHost().getIpv4Hostname() + ":" + this.webnet;
+            this.hostAddress = "http://" + image.getIpHost().getIpv4Hostname() + ":" + this.port;
             this.creds = (ICredentialsUsernamePassword) image.getDefaultCredentials();
             IConfidentialTextService cts = framework.getConfidentialTextService();
             cts.registerText(creds.getUsername(), "GenApp username");
@@ -65,12 +63,12 @@ public class GenAppImpl implements IGenApp {
 
     @Override
     public String getAddress() {
-        return this.baseAddress;
+        return this.hostAddress;
     }
 
     @Override
-    public int getWebnetPort() {
-        return this.webnet;
+    public String provisionCustomerName() {
+        return Integer.toHexString(new Random().nextInt()).substring(0, 6);
     }
 
     @Override

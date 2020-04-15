@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
  * 
  * @galasa.cps.property
  * 
- * @galasa.name genapp.instance.[GENAPPNAME].web.port
+ * @galasa.name genapp.instance.[GENAPPNAME].json.port
  * 
  * @galasa.description Provides the exposed Http-port of the CICS-region with GenApp
  * 
@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
  * @galasa.valid_values Any valid TCP Port number
  * 
  * @galasa.examples 
- * <code>genapp.instance.[GENAPPNAME].web.port=54321</code>
+ * <code>genapp.instance.[GENAPPNAME].json.port=54321</code>
  * 
  * @galasa.extra
  * This allows the manager to interact with CB12 through an HTTP-client with JSON requests and responses.
@@ -36,7 +36,7 @@ import javax.validation.constraints.NotNull;
 public class GenAppWebPort extends CpsProperties{
     public static int get(@NotNull String instance)
             throws ConfigurationPropertyStoreException, GenAppManagerException {
-        String webport = getStringWithDefault(GenAppPropertiesSingleton.cps(), "12345", "instance", "webnet.port",instance);
+        String webport = getStringWithDefault(GenAppPropertiesSingleton.cps(), "12345", "instance", "json.port",instance);
         return Integer.parseInt(webport);
     }
 }

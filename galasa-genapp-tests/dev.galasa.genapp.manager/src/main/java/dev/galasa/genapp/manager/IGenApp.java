@@ -17,10 +17,7 @@ public interface IGenApp {
      */
     public String getAddress();
 
-    /**
-     * Refers to the port that the http-client will contact
-     */
-    public int getWebnetPort();
+    public String provisionCustomerName();
 
     /**
      * Return an ICustomer object of a given ID

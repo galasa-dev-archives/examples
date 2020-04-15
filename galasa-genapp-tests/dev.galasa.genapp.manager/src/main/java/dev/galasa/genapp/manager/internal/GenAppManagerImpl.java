@@ -133,19 +133,19 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
             String dseInstance = GenAppDseInstance.get();
 
             String applid = GenAppCicsApplID.get(dseInstance);
-            int webnetPort = GenAppWebPort.get(dseInstance);
+            int port = GenAppWebPort.get(dseInstance);
 
             String imageId = GenAppZosImage.get(dseInstance);
             IZosImage image = zosManager.getUnmanagedImage(imageId);
 
             String host = image.getIpHost().getIpv4Hostname();
-            int port = image.getIpHost().getTelnetPort();
+            int telnetPort = image.getIpHost().getTelnetPort();
             Boolean tls = image.getIpHost().isTelnetPortTls();
 
-            Zos3270TerminalImpl terminal3270 = new Zos3270TerminalImpl("GenAppTerminal", host, port, tls, framework);
+            Zos3270TerminalImpl terminal3270 = new Zos3270TerminalImpl("GenAppTerminal", host, telnetPort, tls, framework);
             terminal3270.connect();
 
-            GenAppImpl genApp = new GenAppImpl(terminal3270, applid, webnetPort, image, framework);
+            GenAppImpl genApp = new GenAppImpl(terminal3270, applid, port, image, framework);
             this.genapp = genApp;
             return genApp;
         } catch (Zos3270ManagerException | InterruptedException | IpNetworkManagerException | ZosManagerException
@@ -161,14 +161,14 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
             dseInstance = GenAppDseInstance.get();
             String applid = GenAppCicsApplID.get(dseInstance);
 
-            int webnetPort = GenAppWebPort.get(dseInstance);
+            int port = GenAppWebPort.get(dseInstance);
 
             String imageId = GenAppZosImage.get(dseInstance);
             IZosImage image = zosManager.getUnmanagedImage(imageId);
 
             String host = image.getIpHost().getIpv4Hostname();
 
-            return new BasicGenAppimpl(applid, host, webnetPort);
+            return new BasicGenAppimpl(applid, host, port);
         } catch (ConfigurationPropertyStoreException | GenAppManagerException | ZosManagerException e) {
             throw new GenAppManagerException("Issue creating Basic GenApp Instance", e);
         }

@@ -24,6 +24,7 @@ import dev.galasa.artifact.TestBundleResourceException;
 import dev.galasa.core.manager.CoreManager;
 import dev.galasa.core.manager.ICoreManager;
 import dev.galasa.core.manager.StoredArtifactRoot;
+import dev.galasa.genapp.manager.AreasTested;
 import dev.galasa.genapp.manager.Customer;
 import dev.galasa.genapp.manager.GenApp;
 import dev.galasa.genapp.manager.GenAppManagerException;
@@ -34,10 +35,11 @@ import dev.galasa.http.HttpClientException;
 import dev.galasa.http.IHttpClient;
 
 @Test
+@AreasTested(areas = {"customer"})
 public class ProvisionedTest {
 
     @GenApp
-    public IGenApp genapp;
+    public IGenApp genApp;
 
     @Customer
     public ICustomer customer;
@@ -57,23 +59,23 @@ public class ProvisionedTest {
     @Test
     public void prosivionedAccountTest() throws GenAppManagerException, URISyntaxException, TestBundleResourceException,
             JsonSyntaxException, IOException, HttpClientException {
-        String runId = coreManager.getRunName();
+        String provisionedName = genApp.provisionCustomerName();
 
-        customer.updateFirstName("Test" + runId);
+        customer.updateFirstName(provisionedName);
 
         HashMap<String, Object> inquireParameters = new HashMap<String, Object>();
         inquireParameters.put("NUM", customer.getCustomerNumber());
         InputStream inquireIs = resources.retrieveSkeletonFile("resources/skeletons/customerInquire.skel", inquireParameters);
         String jsonRequest = resources.streamAsString(inquireIs);
 
-        storeOutput("webservice", "inquireRequest.txt", jsonRequest);
+        storeOutput("apicall", "inquireRequest.txt", jsonRequest);
 
         JsonObject customerInquireJson = new Gson().fromJson(jsonRequest, JsonObject.class);
 
-        client.setURI(new URI("http://" + genapp.getAddress() + ":" + genapp.getWebnetPort()));
-        JsonObject inquireResponseBody = client.postJson(genapp.getInquireCustomerPath(), customerInquireJson).getContent();
+        client.setURI(new URI(genApp.getAddress()));
+        JsonObject inquireResponseBody = client.postJson(genApp.getInquireCustomerPath(), customerInquireJson).getContent();
 
-        storeOutput("webservice", "inquireResponse.txt", new Gson().toJson(inquireResponseBody));
+        storeOutput("apicall", "inquireResponse.txt", new Gson().toJson(inquireResponseBody));
 
         String webServiceFirstName = extractFromInquireJson(inquireResponseBody, "ca_first_name");
 
@@ -83,29 +85,29 @@ public class ProvisionedTest {
     @Test
     public void addWebserviceAccount() throws TestBundleResourceException, IOException, HttpClientException,
             URISyntaxException, GenAppManagerException {
-        String runId = coreManager.getRunName();
+        String provisionedName = genApp.provisionCustomerName();
 
         HashMap<String, Object> addParameters = new HashMap<String, Object>();
-        addParameters.put("ID", runId);
+        addParameters.put("ID", provisionedName);
         InputStream addIs = resources.retrieveSkeletonFile("resources/skeletons/customerAdd.skel", addParameters);
         String jsonRequest = resources.streamAsString(addIs);
 
-        storeOutput("webservice", "addRequest.txt", jsonRequest);
+        storeOutput("apicall", "addRequest.txt", jsonRequest);
 
         JsonObject customerAddJson = new Gson().fromJson(jsonRequest, JsonObject.class);
 
-        client.setURI(new URI("http://" + genapp.getAddress() + ":" + genapp.getWebnetPort()));
-        JsonObject addResponseBody = client.postJson(genapp.getAddCustomerPath(), customerAddJson).getContent();
+        client.setURI(new URI(genApp.getAddress()));
+        JsonObject addResponseBody = client.postJson(genApp.getAddCustomerPath(), customerAddJson).getContent();
 
-        storeOutput("webservice", "addResponse.txt", new Gson().toJson(addResponseBody));
+        storeOutput("apicall", "addResponse.txt", new Gson().toJson(addResponseBody));
 
         int customerNumber = extractFromAddJson(addResponseBody);
 
-        ICustomer customer = genapp.inquireCustomer(customerNumber);
+        ICustomer customer = genApp.inquireCustomer(customerNumber);
 
         assertThat(customer).isNotNull();
-        assertThat(customer.getFirstName()).isEqualTo("Test" + runId);
-        assertThat(customer.getLastName()).isEqualTo("Case" + runId);
+        assertThat(customer.getFirstName()).isEqualTo(provisionedName);
+        assertThat(customer.getLastName()).isEqualTo(provisionedName);
     }
 
     private String extractFromInquireJson(JsonObject json, String field) {
