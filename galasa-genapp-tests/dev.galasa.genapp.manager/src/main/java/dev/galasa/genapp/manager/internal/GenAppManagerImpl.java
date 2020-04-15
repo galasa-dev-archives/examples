@@ -19,9 +19,11 @@ import dev.galasa.framework.spi.IConfigurationPropertyStoreService;
 import dev.galasa.framework.spi.IFramework;
 import dev.galasa.framework.spi.IManager;
 import dev.galasa.framework.spi.ResourceUnavailableException;
+import dev.galasa.genapp.manager.BasicGenApp;
 import dev.galasa.genapp.manager.Customer;
 import dev.galasa.genapp.manager.GenApp;
 import dev.galasa.genapp.manager.GenAppManagerException;
+import dev.galasa.genapp.manager.IBasicGenApp;
 import dev.galasa.genapp.manager.ICustomer;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.genapp.manager.IGenAppManager;
@@ -149,6 +151,18 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
         } catch (Zos3270ManagerException | InterruptedException | IpNetworkManagerException | ZosManagerException
                 | ConfigurationPropertyStoreException | NetworkException e) {
             throw new GenAppManagerException("Issue generating sources for GenApp instance", e);
+        }
+    }
+
+    @GenerateAnnotatedField(annotation = BasicGenApp.class)
+    public IBasicGenApp generateBasicGenApp(Field field, List<Annotation> annotations) throws GenAppManagerException {
+        String dseInstance;
+        try {
+            dseInstance = GenAppDseInstance.get();
+            String applid = GenAppCicsApplID.get(dseInstance);
+            return new BasicGenAppimpl(applid);
+        } catch (ConfigurationPropertyStoreException | GenAppManagerException e) {
+            throw new GenAppManagerException("Issue creating Basic GenApp Instance", e);
         }
     }
 

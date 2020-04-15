@@ -147,7 +147,10 @@ public class GenAppImpl implements IGenApp {
     }
 
     public ICustomer addCustomer() throws GenAppManagerException {
-        return inquireCustomer(1);
+        terminal.waitForKeyboard()
+                .type("ssc1").enter().waitForKeyboard()
+                .positionCursorToFieldContaining("Select Option").tab()
+                .type("2").enter().waitForKeyboard();
     }
 
     private void logon() throws GenAppManagerException {

@@ -25,6 +25,8 @@ import dev.galasa.artifact.TestBundleResourceException;
 import dev.galasa.core.manager.CoreManager;
 import dev.galasa.core.manager.CoreManagerException;
 import dev.galasa.core.manager.ICoreManager;
+import dev.galasa.genapp.manager.BasicGenApp;
+import dev.galasa.genapp.manager.IBasicGenApp;
 import dev.galasa.http.HttpClient;
 import dev.galasa.http.HttpClientException;
 import dev.galasa.http.IHttpClient;
@@ -57,8 +59,8 @@ public class BasicTest {
     @HttpClient
     public IHttpClient client;
 
-    // ApplID of the CICS-region that contains the GenApp installation
-    final String APPLID = "CICPY01D";
+    @BasicGenApp
+    public IBasicGenApp genApp;
 
     @Test
     public void test() throws CoreManagerException, InterruptedException, Zos3270Exception, TestBundleResourceException,
@@ -97,20 +99,23 @@ public class BasicTest {
 
         // Ensuring that the added customer is also available through 3270-terminal
         loginToSCC1();
+
         inquireCustomer(customerId);
 
         assertThat(terminal.retrieveScreen()).contains("Test" + runId);
         assertThat(terminal.retrieveScreen()).contains("Case" + runId);
 
         terminal.positionCursorToFieldContaining("Cust Number").tab()
-        .type(defaultId.substring(0,defaultId.length()-customerId.length()) + customerId)
-        .positionCursorToFieldContaining("Select Option").tab()
-        .type("4").enter().waitForKeyboard()
-        .positionCursorToFieldContaining("First").tab()
-        .type("Update" + runId)
-        .positionCursorToFieldContaining("Last").tab()
-        .type("UCase" + runId)
-        .enter().waitForKeyboard();
+                .type(defaultId.substring(0,defaultId.length()-customerId.length()) + customerId)
+                .positionCursorToFieldContaining("Select Option").tab()
+                .type("4").enter().waitForKeyboard()
+                .positionCursorToFieldContaining("First").tab()
+                .type("Update" + runId)
+                .positionCursorToFieldContaining("Last").tab()
+                .type("UCase" + runId)
+                .enter().waitForKeyboard();
+
+        inquireCustomer(customerId);
 
         assertThat(terminal.retrieveScreen()).contains("Update" + runId);
         assertThat(terminal.retrieveScreen()).contains("UCase" + runId);
@@ -122,7 +127,7 @@ public class BasicTest {
         ICredentialsUsernamePassword creds = (ICredentialsUsernamePassword) coreManager.getCredentials("GENAPP");
         coreManager.registerConfidentialText(creds.getPassword(), creds.getUsername() + " password");
         // Logging into the CICS-region that has GenApp running on it
-        terminal.waitForKeyboard().type("logon applid(" + APPLID + ")").enter().waitForTextInField("Userid").pf3()
+        terminal.waitForKeyboard().type("logon applid(" + genApp.getApplId() + ")").enter().waitForTextInField("Userid").pf3()
                 .waitForTextInField("Sign-on is terminated").clear().waitForKeyboard().type("cesl").enter()
                 .waitForTextInField("Userid").positionCursorToFieldContaining("Userid").tab().type(creds.getUsername())
                 .positionCursorToFieldContaining("Password").tab().type(creds.getPassword()).enter().waitForKeyboard()
