@@ -4,6 +4,8 @@ import dev.galasa.genapp.manager.ICustomer;
 
 public class CustomerImpl implements ICustomer {
 
+    private GenAppImpl genApp;
+
     private int customerNumber;
     private String firstName;
     private String lastName;
@@ -15,9 +17,10 @@ public class CustomerImpl implements ICustomer {
     private String mobilePhone;
     private String emailAddress;
 
-    public CustomerImpl(int customerNumber, String firstName, String lastName,
+    public CustomerImpl(GenAppImpl genapp, int customerNumber, String firstName, String lastName,
             String dateOfBirth, String houseName, String houseNumber, String postcode,
             String homePhone, String mobilePhone, String emailAddress) {
+        this.genApp = genapp;
         this.customerNumber = customerNumber;
         this.firstName = firstName;
         this.lastName = lastName;

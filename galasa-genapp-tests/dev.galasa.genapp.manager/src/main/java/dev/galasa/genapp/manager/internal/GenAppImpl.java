@@ -135,7 +135,7 @@ public class GenAppImpl implements IGenApp {
         String mobPhone = terminal.retrieveFieldTextAfterFieldWithString("Phone: Mob");
         String emailAddress = terminal.retrieveFieldTextAfterFieldWithString("Email  Addr");
 
-        ICustomer customer = new CustomerImpl(id, firstName, lastName, dob, houseName, 
+        ICustomer customer = new CustomerImpl(this, id, firstName, lastName, dob, houseName, 
                                 houseNum, postcode, homePhone, mobPhone, emailAddress);
 
         terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
@@ -147,10 +147,18 @@ public class GenAppImpl implements IGenApp {
     }
 
     public ICustomer addCustomer() throws GenAppManagerException {
-        terminal.waitForKeyboard()
-                .type("ssc1").enter().waitForKeyboard()
-                .positionCursorToFieldContaining("Select Option").tab()
-                .type("2").enter().waitForKeyboard();
+        try {
+            terminal.waitForKeyboard()
+                    .type("ssc1").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Select Option").tab()
+                    .type("2").enter().waitForKeyboard();
+            
+            String customerNum = terminal.retrieveFieldTextAfterFieldWithString("Cust Number");
+
+            return new CustomerImpl(this, Integer.parseInt(customerNum), "", "", "", "", "", "", "", "", "");
+        } catch(InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Inquiring Customer", e);
+        }
     }
 
     private void logon() throws GenAppManagerException {
