@@ -14,6 +14,19 @@ import dev.galasa.framework.spi.ValidAnnotatedFields;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.genapp.manager.internal.GenAppManagerField;
 
+/**
+ * General Application (CB12) 
+ * 
+ * @galasa.annotation
+ * 
+ * @galasa.description The <code>{@literal @}GenApp</code> annotation requests Galasa to provision an instance of GenApp that provides the original GenApp functionality in JAVA
+ * 
+ * @galasa.examples 
+ * <code>{@literal @}GenApp<br>
+ * public IGenApp genapp;<br>
+ * </code>
+ * 
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD })
 @GenAppManagerField
