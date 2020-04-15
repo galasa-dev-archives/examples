@@ -153,6 +153,13 @@ public class GenAppImpl implements IGenApp {
                 .type("2").enter().waitForKeyboard();
     }
 
+    public void updateCustomer(ICustomer customer, String field) {
+        terminal.waitForKeyboard()
+                .type("ssc1").enter().waitForKeyboard()
+                .positionCursorToFieldContaining("Select Option").tab()
+                .type("4").enter().waitForKeyboard();
+    }
+
     private void logon() throws GenAppManagerException {
         try {
             terminal.waitForKeyboard()

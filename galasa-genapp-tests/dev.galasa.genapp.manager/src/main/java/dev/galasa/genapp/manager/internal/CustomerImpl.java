@@ -15,9 +15,12 @@ public class CustomerImpl implements ICustomer {
     private String mobilePhone;
     private String emailAddress;
 
-    public CustomerImpl(int customerNumber, String firstName, String lastName,
+    private GenAppImpl genAppImpl;
+
+    public CustomerImpl(GenAppImpl genAppImpl, int customerNumber, String firstName, String lastName,
             String dateOfBirth, String houseName, String houseNumber, String postcode,
             String homePhone, String mobilePhone, String emailAddress) {
+        this.genAppImpl = genAppImpl;
         this.customerNumber = customerNumber;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -86,6 +89,57 @@ public class CustomerImpl implements ICustomer {
 
     @Override
     public String getEmailAddress() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    
+    private int setCustomerNumber() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    private String setFirstName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private String setLastName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private String setDateOfBirth() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private String setHouseName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private String setHouseNumber() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private String setPostCode() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private String setHomePhone() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private String setMobilePhone() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private String setEmailAddress() {
         // TODO Auto-generated method stub
         return null;
     }
