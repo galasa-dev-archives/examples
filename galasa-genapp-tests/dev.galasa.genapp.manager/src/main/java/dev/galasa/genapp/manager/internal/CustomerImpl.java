@@ -5,6 +5,9 @@ import dev.galasa.genapp.manager.ICustomer;
 
 public class CustomerImpl implements ICustomer {
 
+    /**
+     * Having this variable allows each customer-instance to access the GenApp-instance that does all the 3270-interaction
+     */
     private GenAppImpl genApp;
 
     private final int customerNumber;
@@ -84,54 +87,81 @@ public class CustomerImpl implements ICustomer {
         return this.emailAddress;
     }
 
+    /**
+     * An update function that interacts with the GenApp-object itself to update the firstname in the instance and in the GenApp-Data
+     */
     @Override
     public void updateFirstName(String firstName) throws GenAppManagerException {
         this.firstName = firstName;
         genApp.updateCustomer(this, "First",firstName);
     }
 
+    /**
+     * An update function that interacts with the GenApp-object itself to update the lastName in the instance and in the GenApp-Data
+     */
     @Override
     public void updateLastName(String lastName) throws GenAppManagerException {
         this.lastName = lastName;
         genApp.updateCustomer(this, "Last",lastName);
     }
 
+    /**
+     * An update function that interacts with the GenApp-object itself to update the dateOfBirth in the instance and in the GenApp-Data
+     */
     @Override
     public void updateDateOfBirth(String dateOfBirth) throws GenAppManagerException {
         this.dateOfBirth = dateOfBirth;
         genApp.updateCustomer(this, "DOB",dateOfBirth);
     }
 
+    /**
+     * An update function that interacts with the GenApp-object itself to update the houseName in the instance and in the GenApp-Data
+     */
     @Override
     public void updateHouseName(String houseName) throws GenAppManagerException {
         this.houseName = houseName;
         genApp.updateCustomer(this, "House Name",houseName);
     }
 
+    /**
+     * An update function that interacts with the GenApp-object itself to update the houseNumber in the instance and in the GenApp-Data
+     */
     @Override
     public void updateHouseNumber(String houseNumber) throws GenAppManagerException {
         this.houseNumber = houseNumber;
         genApp.updateCustomer(this, "House Number",houseNumber);
     }
 
+    /**
+     * An update function that interacts with the GenApp-object itself to update the postcode in the instance and in the GenApp-Data
+     */
     @Override
     public void updatePostCode(String postcode) throws GenAppManagerException {
         this.postcode = postcode;
         genApp.updateCustomer(this, "Postcode",postcode);
     }
 
+    /**
+     * An update function that interacts with the GenApp-object itself to update the homePhone in the instance and in the GenApp-Data
+     */
     @Override
     public void updateHomePhone(String homePhone) throws GenAppManagerException {
         this.homePhone = homePhone;
         genApp.updateCustomer(this, "Phone: Home",homePhone);
     }
 
+    /**
+     * An update function that interacts with the GenApp-object itself to update the mobilePhone in the instance and in the GenApp-Data
+     */
     @Override
     public void updateMobilePhone(String mobilePhone) throws GenAppManagerException {
         this.mobilePhone = mobilePhone;
         genApp.updateCustomer(this, "Phone: Mob",mobilePhone);
     }
 
+    /**
+     * An update function that interacts with the GenApp-object itself to update the emailAddress in the instance and in the GenApp-Data
+     */
     @Override
     public void updateEmailAddress(String emailAddress) throws GenAppManagerException {
         this.emailAddress = emailAddress;

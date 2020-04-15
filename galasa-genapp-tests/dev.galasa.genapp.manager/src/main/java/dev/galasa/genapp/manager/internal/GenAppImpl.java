@@ -26,6 +26,9 @@ public class GenAppImpl implements IGenApp {
 
     private final String PREFIX = "GENAPP";
 
+    /**
+     * These variables are referring to the JSON-requests that are allowed by the GenApp installation
+     */
     private final String getCustomer = "getCustomerDetails";
     private final String addCustomer = "addCustomerDetails";
     private final String getCommercial = "getCommercialPolicyDetails";
@@ -120,6 +123,10 @@ public class GenAppImpl implements IGenApp {
         return this.PREFIX + "/" + this.getCommercial;
     }
 
+    /**
+     * Interacting with GenApp through its 3270-connection to be able to inquire a specific customer through its unique identifier ID
+     * @throws GenAppManagerException
+     */
     public ICustomer inquireCustomer(int id) throws GenAppManagerException {
         String defaultId = "0000000000";
         String customerId = Integer.toString(id);
@@ -155,6 +162,10 @@ public class GenAppImpl implements IGenApp {
         }
     }
 
+    /**
+     * Interacting with GenApp through its 3270-connection to be able to add a clean new customer
+     * @throws GenAppManagerException
+     */
     public ICustomer addCustomer() throws GenAppManagerException {
         try {
             terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard()
@@ -168,6 +179,10 @@ public class GenAppImpl implements IGenApp {
         }
     }
 
+    /**
+     * Interacting with GenApp through its 3270-connection to update a specific value of the GenApp-data
+     * @throws GenAppManagerException
+     */
     public ICustomer updateCustomer(ICustomer customer, String field, String value) throws GenAppManagerException {
         try {
             String defaultId = "0000000000";
@@ -198,6 +213,10 @@ public class GenAppImpl implements IGenApp {
         }
     }
 
+    /**
+     * A static way to log in to the Application ID that is assigned through the cps.properties
+     * @throws GenAppManagerException
+     */
     private void logon() throws GenAppManagerException {
         try {
             terminal.waitForKeyboard()
