@@ -14,14 +14,11 @@ public class ProvisionedTest {
     @GenApp
     public IGenApp genapp;
 
-    @Customer(userID = 12)
-    public ICustomer existingCustomer;
-
     @Customer()
-    public ICustomer newCustomer;
+    public ICustomer customer;
 
     @Test
-    public void testTest() {
-        assertThat(1).isEqualTo(1);
+    public void ProsivionedAccountTest() {
+        
     }
 }

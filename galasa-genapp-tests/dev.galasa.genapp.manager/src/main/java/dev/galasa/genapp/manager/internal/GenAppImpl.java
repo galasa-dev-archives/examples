@@ -161,6 +161,26 @@ public class GenAppImpl implements IGenApp {
         }
     }
 
+    public ICustomer updateCustomer(ICustomer customer, String field, String value) throws GenAppManagerException {
+        try {
+            String defaultId = "0000000000";
+
+            String customerId = Integer.toString(customer.getCustomerNumber());
+
+            terminal.positionCursorToFieldContaining("Cust Number").tab()
+                .type(defaultId.substring(0,defaultId.length()-customerId.length()) + customerId)
+                .positionCursorToFieldContaining("Select Option").tab()
+                .type("4").enter().waitForKeyboard()
+                .positionCursorToFieldContaining(field).tab()
+                .type(value).enter().waitForKeyboard();
+
+            return inquireCustomer(customer.getCustomerNumber());
+            
+        } catch(InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Adding Customer", e);
+        }
+    }
+
     private void logon() throws GenAppManagerException {
         try {
             terminal.waitForKeyboard()
