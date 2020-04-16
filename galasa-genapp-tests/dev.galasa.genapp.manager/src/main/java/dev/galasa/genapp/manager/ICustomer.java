@@ -45,9 +45,9 @@ public interface ICustomer {
 
     public void updateEmailAddress(String emailAddress) throws GenAppManagerException;
 
-    public ICommercialPolicy createCommercialPolicy(String postcode, String CustomerName, String status);
+    public ICommercialPolicy createCommercialPolicy(String postcode, String customerName, String status) throws GenAppManagerException;
 
-    public IEndowmentPolicy createEndowmentPolicy(String fundName, String lifeAssured, String withProfits, String equities, String managedFunds);
+    public IEndowmentPolicy createEndowmentPolicy(String fundName, String lifeAssured, String withProfits, String equities, String managedFunds) throws GenAppManagerException;
 
     public IHousePolicy createHousePolicy(String propertyType, int bedrooms, int value, String houseName, String houseNumber, String postcode);
 

@@ -15,7 +15,7 @@ public interface IEndowmentPolicy {
 
     public String getLifeAssured();
 
-    public int getWithProfits();
+    public String getWithProfits();
 
     public String getEquities();
 
