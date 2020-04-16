@@ -18,7 +18,9 @@ import dev.galasa.zos3270.FieldNotFoundException;
 import dev.galasa.zos3270.ITerminal;
 import dev.galasa.zos3270.KeyboardLockedException;
 import dev.galasa.zos3270.TextNotFoundException;
+import dev.galasa.zos3270.TimeoutException;
 import dev.galasa.zos3270.Zos3270Exception;
+import dev.galasa.zos3270.spi.NetworkException;
 
 public class GenAppImpl implements IGenApp {
 
@@ -138,15 +140,14 @@ public class GenAppImpl implements IGenApp {
         String customerId = Integer.toString(id);
 
         try {
-            terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard();
+            navigateTo("ssc1");
             fillField("Cust Number", customerId, '0');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("No data was returned.")) {
-                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
                 return null;
             }
-        
+
             String firstName = terminal.retrieveFieldTextAfterFieldWithString("First").trim();
             String lastName = terminal.retrieveFieldTextAfterFieldWithString("Last").trim();
             String dob = terminal.retrieveFieldTextAfterFieldWithString("DOB").trim();
@@ -159,8 +160,6 @@ public class GenAppImpl implements IGenApp {
 
             ICustomer customer = new CustomerImpl(this, id, firstName, lastName, dob, houseName, houseNum, postcode,
                     homePhone, mobPhone, emailAddress);
-
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
             return customer;
         } catch (InterruptedException | Zos3270Exception e) {
@@ -176,12 +175,10 @@ public class GenAppImpl implements IGenApp {
      */
     public ICustomer addCustomer() throws GenAppManagerException {
         try {
-            terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
+            navigateTo("ssc1");
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
 
             String customerNum = terminal.retrieveFieldTextAfterFieldWithString("Cust Number");
-
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
             return new CustomerImpl(this, Integer.parseInt(customerNum), "", "", "", "", "", "", "", "", "");
         } catch (InterruptedException | Zos3270Exception e) {
@@ -199,14 +196,12 @@ public class GenAppImpl implements IGenApp {
         try {
             String customerId = Integer.toString(customer.getCustomerNumber());
 
-            terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard();
+            navigateTo("ssc1");
             fillField("Cust Number", customerId, '0');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("4").enter().waitForKeyboard();
 
             fillField(field, value, ' ');
             terminal.enter().waitForKeyboard();
-
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
             return inquireCustomer(customer.getCustomerNumber());
 
@@ -220,13 +215,12 @@ public class GenAppImpl implements IGenApp {
         String policyId = Integer.toString(policyNumber);
 
         try {
-            terminal.waitForKeyboard().type("ssp1").enter().waitForKeyboard();
+            navigateTo("ssp1");
             fillField("Policy Number", policyId, '0');
             fillField("Cust Number", customerId, '0');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("No data was returned.")) {
-                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
                 return null;
             }
 
@@ -235,16 +229,15 @@ public class GenAppImpl implements IGenApp {
             int carValue = Integer.parseInt(terminal.retrieveFieldTextAfterFieldWithString("Status").trim());
             String carRegistration = terminal.retrieveFieldTextAfterFieldWithString("Registration").trim();
 
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
-
-            return new MotorPolicyImpl(customer, policyNumber, carMake, carModel, carValue , carRegistration);
+            return new MotorPolicyImpl(customer, policyNumber, carMake, carModel, carValue, carRegistration);
 
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
         }
     }
 
-    public IMotorPolicy createMotorPolicy(ICustomer customer, String carMake, String carModel, int carValue, String carRegistration) throws GenAppManagerException {
+    public IMotorPolicy createMotorPolicy(ICustomer customer, String carMake, String carModel, int carValue,
+            String carRegistration) throws GenAppManagerException {
         int policyNumber = 0;
         while (inquireMotorPolicy(customer, policyNumber) != null) {
             policyNumber++;
@@ -254,7 +247,7 @@ public class GenAppImpl implements IGenApp {
         String carValueStr = Integer.toString(carValue);
 
         try {
-            terminal.waitForKeyboard().type("ssp1").enter().waitForKeyboard();
+            navigateTo("ssp1");
             fillField("Policy Number", policyId, '0');
             fillField("Cust Number", customerId, '0');
             fillField("Car Value", carValueStr, '0');
@@ -262,31 +255,27 @@ public class GenAppImpl implements IGenApp {
             fillField("Car Model", carModel, ' ');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
 
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
-
             if (!terminal.retrieveScreen().contains("New Motor Policy Inserted")) {
                 return null;
             }
 
-            return new MotorPolicyImpl(customer, policyNumber, carMake, carModel, carValue , carRegistration);
+            return new MotorPolicyImpl(customer, policyNumber, carMake, carModel, carValue, carRegistration);
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
         }
     }
 
-    public IEndowmentPolicy inquireEndowmentPolicy(ICustomer customer, int policyNumber)
-            throws GenAppManagerException {
+    public IEndowmentPolicy inquireEndowmentPolicy(ICustomer customer, int policyNumber) throws GenAppManagerException {
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
 
         try {
-            terminal.waitForKeyboard().type("ssp2").enter().waitForKeyboard();
+            navigateTo("ssp2");
             fillField("Policy Number", policyId, '0');
             fillField("Cust Number", customerId, '0');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("No data was returned.")) {
-                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
                 return null;
             }
 
@@ -296,9 +285,8 @@ public class GenAppImpl implements IGenApp {
             String equities = terminal.retrieveFieldTextAfterFieldWithString("Equities").trim();
             String managedFunds = terminal.retrieveFieldTextAfterFieldWithString("Managed Funds").trim();
 
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
-
-            return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities, managedFunds);
+            return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities,
+                    managedFunds);
 
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Endowment Policy", e);
@@ -315,7 +303,7 @@ public class GenAppImpl implements IGenApp {
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
         try {
-            terminal.waitForKeyboard().type("ssp2").enter().waitForKeyboard();
+            navigateTo("ssp2");
             fillField("Policy Number", policyId, '0');
             fillField("Cust Number", customerId, '0');
             fillField("Fund Name", fundName, ' ');
@@ -323,10 +311,9 @@ public class GenAppImpl implements IGenApp {
             fillField("With Profits", withProfits, ' ');
             fillField("Equities", equities, ' ');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+
             if (terminal.retrieveScreen().contains("Policy Inserted"))
-                return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities,
-                        managedFunds);
+                return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities, managedFunds);
             else
                 return null;
         } catch (InterruptedException | Zos3270Exception e) {
@@ -339,13 +326,12 @@ public class GenAppImpl implements IGenApp {
         String policyId = Integer.toString(policyNumber);
 
         try {
-            terminal.waitForKeyboard().type("ssp3").enter().waitForKeyboard();
+            navigateTo("ssp3");
             fillField("Policy Number", policyId, '0');
             fillField("Cust Number", customerId, '0');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("No data was returned.")) {
-                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
                 return null;
             }
 
@@ -356,18 +342,18 @@ public class GenAppImpl implements IGenApp {
             String houseNumber = terminal.retrieveFieldTextAfterFieldWithString("House Number").trim();
             String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode").trim();
 
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
-
-            return new HousePolicyImpl(customer, policyNumber, propertyType, bedRooms, houseValue, houseName, houseNumber, postcode);
+            return new HousePolicyImpl(customer, policyNumber, propertyType, bedRooms, houseValue, houseName,
+                    houseNumber, postcode);
 
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
         }
     }
 
-    public IHousePolicy createHousePolicy(ICustomer customer, String propertyType, int bedRooms, int houseValue, String houseName, String houseNumber, String postcode) throws GenAppManagerException {
+    public IHousePolicy createHousePolicy(ICustomer customer, String propertyType, int bedRooms, int houseValue,
+            String houseName, String houseNumber, String postcode) throws GenAppManagerException {
         int policyNumber = 0;
-        while(inquireHousePolicy(customer, policyNumber) != null) {
+        while (inquireHousePolicy(customer, policyNumber) != null) {
             policyNumber++;
         }
         String customerId = Integer.toString(customer.getCustomerNumber());
@@ -376,7 +362,7 @@ public class GenAppImpl implements IGenApp {
         String houseValueStr = Integer.toString(houseValue);
 
         try {
-            terminal.waitForKeyboard().type("ssp3").enter().waitForKeyboard();
+            navigateTo("ssp3");
             fillField("Policy Number", policyId, '0');
             fillField("Cust Number", customerId, '0');
             fillField("Bedrooms", bedroomsStr, '0');
@@ -386,23 +372,18 @@ public class GenAppImpl implements IGenApp {
             fillField("House Number", houseNumber, ' ');
             fillField("Postcode", postcode, ' ');
 
-            terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter()
-                    .waitForKeyboard();
-
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
 
             if (!terminal.retrieveScreen().contains("New Motor Policy Inserted")) {
                 return null;
             }
 
-            return new HousePolicyImpl(customer, policyNumber, propertyType, bedRooms, houseValue, houseName, houseNumber, postcode);
+            return new HousePolicyImpl(customer, policyNumber, propertyType, bedRooms, houseValue, houseName,
+                    houseNumber, postcode);
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
         }
     }
-
-
-    
 
     public ICommercialPolicy inquireCommercialPolicy(ICustomer customer, int policyNumber)
             throws GenAppManagerException {
@@ -410,22 +391,18 @@ public class GenAppImpl implements IGenApp {
         String policyId = Integer.toString(policyNumber);
 
         try {
-            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard();
+            navigateTo("ssp4");
             fillField("Policy Number", policyId, '0');
             fillField("Cust Number", customerId, '0');
-            terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter()
-                    .waitForKeyboard();
-            
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
+
             if (terminal.retrieveScreen().contains("No data was returned.")) {
-                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
                 return null;
             }
 
             String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode").trim();
             String customerName = terminal.retrieveFieldTextAfterFieldWithString("Customer Name").trim();
             String status = terminal.retrieveFieldTextAfterFieldWithString("Status").trim();
-
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
             return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
         } catch (InterruptedException | Zos3270Exception e) {
@@ -443,14 +420,14 @@ public class GenAppImpl implements IGenApp {
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
         try {
-            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard();
+            navigateTo("ssp4");
             fillField("Policy Number", policyId, '0');
             fillField("Cust Number", customerId, '0');
             fillField("Postcode", postcode, ' ');
             fillField("Customer Name", customerName, ' ');
             fillField("Status", status, ' ');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+            
             if (terminal.retrieveScreen().contains("Policy Inserted"))
                 return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
             else
@@ -459,6 +436,7 @@ public class GenAppImpl implements IGenApp {
             throw new GenAppManagerException("Issue Adding Commercial Policy", e);
         }
     }
+
     /**
      * A static way to log in to the Application ID that is assigned through the
      * cps.properties
@@ -475,6 +453,17 @@ public class GenAppImpl implements IGenApp {
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue logging into GenApp", e);
         }
+    }
+
+    private void navigateTo(String transaction) throws TimeoutException, KeyboardLockedException, NetworkException,
+            FieldNotFoundException, InterruptedException {
+        if(terminal.retrieveScreen().contains(transaction.toUpperCase()))
+            return;
+
+        if(terminal.retrieveScreen().contains("Select Option"))
+            terminal.waitForKeyboard().pf3().waitForKeyboard().clear();
+
+        terminal.waitForKeyboard().type(transaction).enter().waitForKeyboard();
     }
 
     private void fillField(String field, String value, Character baseChar)
