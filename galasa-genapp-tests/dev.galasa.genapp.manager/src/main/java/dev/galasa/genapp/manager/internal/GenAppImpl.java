@@ -7,6 +7,7 @@ import dev.galasa.ICredentialsUsernamePassword;
 import dev.galasa.framework.spi.IConfidentialTextService;
 import dev.galasa.framework.spi.IFramework;
 import dev.galasa.genapp.manager.GenAppManagerException;
+import dev.galasa.genapp.manager.ICommercialPolicy;
 import dev.galasa.genapp.manager.ICustomer;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.zos.IZosImage;
@@ -132,8 +133,8 @@ public class GenAppImpl implements IGenApp {
         try {
             terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard()
                     .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId).enter()
-                    .waitForKeyboard().positionCursorToFieldContaining("Select Option").tab().type("1").enter()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
                     .waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("No data was returned."))
@@ -209,6 +210,35 @@ public class GenAppImpl implements IGenApp {
         } catch(InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Adding Customer", e);
         }
+    }
+
+    public ICommercialPolicy inquireCommercialPolicy(ICustomer customer, int policyNumber)
+            throws GenAppManagerException {
+        String defaultId = "0000000000";
+        String customerId = Integer.toString(customer.getCustomerNumber());
+        String policyId = Integer.toString(policyNumber);
+
+        try {
+            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Policy Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
+                    .waitForKeyboard();
+            
+            if (terminal.retrieveScreen().contains("No data was returned."))
+                return null;
+
+            String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode").trim();
+            String customerName = terminal.retrieveFieldTextAfterFieldWithString("Customer Name").trim();
+            String status = terminal.retrieveFieldTextAfterFieldWithString("Status").trim();
+
+            return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
+        }
+
     }
 
     /**

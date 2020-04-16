@@ -15,4 +15,6 @@ public interface ICommercialPolicy {
 
     public String getCustomerName();
 
+    public String getStatus();
+
 }

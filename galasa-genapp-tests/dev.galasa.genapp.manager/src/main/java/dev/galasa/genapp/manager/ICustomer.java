@@ -45,4 +45,12 @@ public interface ICustomer {
 
     public void updateEmailAddress(String emailAddress) throws GenAppManagerException;
 
+    public ICommercialPolicy createCommercialPolicy(String postcode, String CustomerName, String status);
+
+    public IEndowmentPolicy createEndowmentPolicy(String fundName, String lifeAssured, String withProfits, String equities, String managedFunds);
+
+    public IHousePolicy createHousePolicy(String propertyType, int bedrooms, int value, String houseName, String houseNumber, String postcode);
+
+    public IMotorPolicy createMotorPolicy(String carMake, String carModel, int value, String registration);
+
 }

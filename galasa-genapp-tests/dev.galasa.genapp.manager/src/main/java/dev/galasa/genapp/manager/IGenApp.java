@@ -17,6 +17,9 @@ public interface IGenApp {
      */
     public String getAddress();
 
+    /**
+     * Generate a 6 character hex string as a random assortment of characters
+     */
     public String provisionCustomerName();
 
     /**

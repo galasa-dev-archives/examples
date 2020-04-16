@@ -1,3 +1,8 @@
+/*
+ * Licensed Materials - Property of IBM
+ * 
+ * (c) Copyright IBM Corp. 2020.
+ */
 package dev.galasa.genapp.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,8 +26,6 @@ import dev.galasa.Test;
 import dev.galasa.artifact.BundleResources;
 import dev.galasa.artifact.IBundleResources;
 import dev.galasa.artifact.TestBundleResourceException;
-import dev.galasa.core.manager.CoreManager;
-import dev.galasa.core.manager.ICoreManager;
 import dev.galasa.core.manager.StoredArtifactRoot;
 import dev.galasa.genapp.manager.AreasTested;
 import dev.galasa.genapp.manager.Customer;
