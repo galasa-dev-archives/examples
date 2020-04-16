@@ -11,8 +11,9 @@ import dev.galasa.genapp.manager.ICommercialPolicy;
 import dev.galasa.genapp.manager.ICustomer;
 import dev.galasa.genapp.manager.IEndowmentPolicy;
 import dev.galasa.genapp.manager.IGenApp;
+import dev.galasa.genapp.manager.IHousePolicy;
 import dev.galasa.genapp.manager.IMotorPolicy;
-import dev.galasa.genapp.manager.internal.properties.MotorPolicyImpl;
+import dev.galasa.genapp.manager.internal.MotorPolicyImpl;
 import dev.galasa.zos.IZosImage;
 import dev.galasa.zos.ZosManagerException;
 import dev.galasa.zos3270.FieldNotFoundException;
@@ -239,15 +240,14 @@ public class GenAppImpl implements IGenApp {
 
             terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
-            return new MotorPolicyImpl(customer, policyId, carMake, carModel, carValue, carRegistration);
+            return new MotorPolicyImpl(customer, policyNumber, carMake, carModel, carValue , carRegistration);
 
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
         }
     }
 
-    public IMotorPolicy addMotorPolicy(ICustomer customer, String carMake, String carModel, int carValue,
-            String carRegistration) throws GenAppManagerException {
+    public IMotorPolicy createMotorPolicy(ICustomer customer, String carMake, String carModel, int carValue, String carRegistration) throws GenAppManagerException {
         int policyNumber = 0;
         while (inquireMotorPolicy(customer, policyNumber) != null) {
             policyNumber++;
@@ -260,7 +260,7 @@ public class GenAppImpl implements IGenApp {
         String carValueStr = Integer.toString(carValue);
 
         try {
-            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard()
+            terminal.waitForKeyboard().type("ssp1").enter().waitForKeyboard()
                     .positionCursorToFieldContaining("Policy Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
@@ -277,73 +277,14 @@ public class GenAppImpl implements IGenApp {
                 return null;
             }
 
-            return new MotorPolicyImpl(customer, policyId, carMake, carModel, carValue, carRegistration);
+            return new MotorPolicyImpl(customer, policyNumber, carMake, carModel, carValue , carRegistration);
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
         }
     }
 
-    public ICommercialPolicy inquireCommercialPolicy(ICustomer customer, int policyNumber)
+    public IEndowmentPolicy inquireEndowmentPolicy(ICustomer customer, int policyNumber)
             throws GenAppManagerException {
-        String defaultId = "0000000000";
-        String customerId = Integer.toString(customer.getCustomerNumber());
-        String policyId = Integer.toString(policyNumber);
-
-        try {
-            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Policy Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
-
-            if (terminal.retrieveScreen().contains("No data was returned."))
-                return null;
-
-            String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode").trim();
-            String customerName = terminal.retrieveFieldTextAfterFieldWithString("Customer Name").trim();
-            String status = terminal.retrieveFieldTextAfterFieldWithString("Status").trim();
-
-            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
-
-            return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
-        } catch (InterruptedException | Zos3270Exception e) {
-            throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
-        }
-
-    }
-
-    public ICommercialPolicy createCommercialPolicy(ICustomer customer, String postcode, String customerName,
-            String status) throws GenAppManagerException {
-        int policyNumber = 1;
-        while (inquireCommercialPolicy(customer, policyNumber) != null) {
-            policyNumber++;
-        }
-
-        String defaultId = "0000000000";
-        String customerId = Integer.toString(customer.getCustomerNumber());
-        String policyId = Integer.toString(policyNumber);
-        try {
-            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Policy Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
-            fillField("Post Code", postcode);
-            fillField("Customer Name", customerName);
-            fillField("Status", status);
-            terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
-
-            if (terminal.retrieveScreen().contains("Policy Inserted"))
-                return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
-            else
-                return null;
-        } catch (InterruptedException | Zos3270Exception e) {
-            throw new GenAppManagerException("Issue Adding Commercial Policy", e);
-        }
-    }
-
-    public IEndowmentPolicy inquireEndowmentPolicy(ICustomer customer, int policyNumber) throws GenAppManagerException {
         String defaultId = "0000000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
@@ -367,8 +308,7 @@ public class GenAppImpl implements IGenApp {
 
             terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
-            return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities,
-                    managedFunds);
+            return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities, managedFunds);
 
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Endowment Policy", e);
@@ -382,7 +322,6 @@ public class GenAppImpl implements IGenApp {
         while (inquireEndowmentPolicy(customer, policyNumber) != null) {
             policyNumber++;
         }
-
         String defaultId = "0000000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
@@ -392,13 +331,11 @@ public class GenAppImpl implements IGenApp {
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
-
             fillField("Fund Name", fundName);
             fillField("Life Assured", lifeAssured);
             fillField("With Profits", withProfits);
             fillField("Equities", equities);
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
-
             if (terminal.retrieveScreen().contains("Policy Inserted"))
                 return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities,
                         managedFunds);
@@ -409,6 +346,147 @@ public class GenAppImpl implements IGenApp {
         }
     }
 
+    public IHousePolicy inquireHousePolicy(ICustomer customer, int policyNumber) throws GenAppManagerException {
+        String defaultId = "0000000000";
+        String customerId = Integer.toString(customer.getCustomerNumber());
+        String policyId = Integer.toString(policyNumber);
+
+        try {
+            terminal.waitForKeyboard().type("ssp3").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Policy Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
+
+            if (terminal.retrieveScreen().contains("No data was returned."))
+                return null;
+
+            String propertyType = terminal.retrieveFieldTextAfterFieldWithString("Property Type").trim();
+            int bedRooms = Integer.parseInt(terminal.retrieveFieldTextAfterFieldWithString("Bedrooms").trim());
+            int houseValue = Integer.parseInt(terminal.retrieveFieldTextAfterFieldWithString("House Value").trim());
+            String houseName = terminal.retrieveFieldTextAfterFieldWithString("House Name").trim();
+            String houseNumber = terminal.retrieveFieldTextAfterFieldWithString("House Number").trim();
+            String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode").trim();
+
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+
+            return new HousePolicyImpl(customer, policyNumber, propertyType, bedRooms, houseValue, houseName, houseNumber, postcode);
+
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
+        }
+    }
+
+    public IHousePolicy createHousePolicy(ICustomer customer, String propertyType, int bedRooms, int houseValue, String houseName, String houseNumber, String postcode) throws GenAppManagerException {
+        int policyNumber = 0;
+        while(inquireHousePolicy(customer, policyNumber) != null) {
+            policyNumber++;
+        }
+
+        String defaultId = "0000000000";
+        String defaultBedrooms = "000";
+        String defaultValue = "00000000";
+        String customerId = Integer.toString(customer.getCustomerNumber());
+        String policyId = Integer.toString(policyNumber);
+        String bedroomsStr = Integer.toString(bedRooms);
+        String houseValueStr = Integer.toString(houseValue);
+
+        try {
+            terminal.waitForKeyboard().type("ssp3").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Policy Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Bedrooms").tab()
+                    .type(defaultBedrooms.substring(0, defaultBedrooms.length() - bedroomsStr.length()) + bedroomsStr)
+                    .positionCursorToFieldContaining("House Value").tab()
+                    .type(defaultValue.substring(0, defaultValue.length() - houseValueStr.length()) + houseValueStr);
+                    
+
+            fillField("Property Type", propertyType);
+            fillField("House Name", houseName);
+            fillField("House Number", houseNumber);
+            fillField("Postcode", postcode);
+
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter()
+                    .waitForKeyboard();
+
+                
+
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+
+            if (!terminal.retrieveScreen().contains("New Motor Policy Inserted")) {
+                return null;
+            }
+
+            return new HousePolicyImpl(customer, policyNumber, propertyType, bedRooms, houseValue, houseName, houseNumber, postcode);
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
+        }
+    }
+
+
+    
+
+    public ICommercialPolicy inquireCommercialPolicy(ICustomer customer, int policyNumber)
+            throws GenAppManagerException {
+        String defaultId = "0000000000";
+        String customerId = Integer.toString(customer.getCustomerNumber());
+        String policyId = Integer.toString(policyNumber);
+
+        try {
+            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Policy Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
+                    .waitForKeyboard();
+            
+            if (terminal.retrieveScreen().contains("No data was returned."))
+                return null;
+
+            String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode").trim();
+            String customerName = terminal.retrieveFieldTextAfterFieldWithString("Customer Name").trim();
+            String status = terminal.retrieveFieldTextAfterFieldWithString("Status").trim();
+
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+
+            return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
+        }
+
+    }
+
+    public ICommercialPolicy createCommercialPolicy(ICustomer customer, String postcode, String customerName,
+            String status) throws GenAppManagerException {
+        int policyNumber = 1;
+        while (inquireCommercialPolicy(customer, policyNumber) != null) {
+            policyNumber++;
+        }
+        String defaultId = "0000000000";
+        String customerId = Integer.toString(customer.getCustomerNumber());
+        String policyId = Integer.toString(policyNumber);
+        try {
+            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Policy Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
+            fillField("Post Code", postcode);
+            fillField("Customer Name", customerName);
+            fillField("Status", status);
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
+            if (terminal.retrieveScreen().contains("Policy Inserted"))
+                return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
+            else
+                return null;
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Adding Commercial Policy", e);
+        }
+    }
     /**
      * A static way to log in to the Application ID that is assigned through the
      * cps.properties

@@ -1,4 +1,4 @@
-package dev.galasa.genapp.manager.internal.properties;
+package dev.galasa.genapp.manager.internal;
 
 import dev.galasa.genapp.manager.ICustomer;
 import dev.galasa.genapp.manager.IMotorPolicy;
@@ -12,9 +12,9 @@ public class MotorPolicyImpl implements IMotorPolicy {
     private int carValue;
     private String carRegistration;
 
-    public MotorPolicyImpl(ICustomer customer, String policyNumber, String carMake, String carModel, int carValue, String carRegistration) {
+    public MotorPolicyImpl(ICustomer customer, int policyNumber, String carMake, String carModel, int carValue, String carRegistration) {
         this.owner = customer;
-        this.policyNumber = Integer.parseInt(policyNumber);
+        this.policyNumber = policyNumber;
         this.carMake = carMake;
         this.carModel = carModel;
         this.carValue = carValue;
