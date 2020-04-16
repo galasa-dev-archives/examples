@@ -205,7 +205,8 @@ public class GenAppImpl implements IGenApp {
 
             String customerId = Integer.toString(customer.getCustomerNumber());
 
-            terminal.positionCursorToFieldContaining("Cust Number").tab()
+            terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Cust Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
                     .positionCursorToFieldContaining("Select Option").tab().type("4").enter().waitForKeyboard();
 
