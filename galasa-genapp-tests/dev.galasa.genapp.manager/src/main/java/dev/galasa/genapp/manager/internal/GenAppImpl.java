@@ -328,8 +328,7 @@ public class GenAppImpl implements IGenApp {
                     .positionCursorToFieldContaining("Policy Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
             fillField("Post Code", postcode);
             fillField("Customer Name", customerName);
             fillField("Status", status);
