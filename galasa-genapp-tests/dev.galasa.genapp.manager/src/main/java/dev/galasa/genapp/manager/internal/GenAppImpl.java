@@ -316,13 +316,12 @@ public class GenAppImpl implements IGenApp {
 
     }
 
-    public IEndowmentPolicy createEndowmentPolicy(ICustomer customer, String fundName, String lifeAssured, 
+    public IEndowmentPolicy createEndowmentPolicy(ICustomer customer, String fundName, String lifeAssured,
             String withProfits, String equities, String managedFunds) throws GenAppManagerException {
         int policyNumber = 1;
         while (inquireEndowmentPolicy(customer, policyNumber) != null) {
-            policyNumber ++;
+            policyNumber++;
         }
-
         String defaultId = "0000000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
@@ -331,16 +330,15 @@ public class GenAppImpl implements IGenApp {
                     .positionCursorToFieldContaining("Policy Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Fund Name").tab().type(fundName)
-                    .positionCursorToFieldContaining("Life Assured").tab().type(lifeAssured)
-                    .positionCursorToFieldContaining("With Profits").tab().type(withProfits)
-                    .positionCursorToFieldContaining("Equities").tab().type(equities)
-                    .positionCursorToFieldContaining("Select Option").tab().type("2").enter()
-                    .waitForKeyboard();
-
-            if(terminal.retrieveScreen().contains("Policy Inserted"))
-                return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities, managedFunds);
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
+            fillField("Fund Name", fundName);
+            fillField("Life Assured", lifeAssured);
+            fillField("With Profits", withProfits);
+            fillField("Equities", equities);
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
+            if (terminal.retrieveScreen().contains("Policy Inserted"))
+                return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities,
+                        managedFunds);
             else
                 return null;
         } catch (InterruptedException | Zos3270Exception e) {
@@ -462,13 +460,12 @@ public class GenAppImpl implements IGenApp {
 
     }
 
-    public ICommercialPolicy createCommercialPolicy(ICustomer customer, String postcode, String customerName, String status)
-            throws GenAppManagerException {
+    public ICommercialPolicy createCommercialPolicy(ICustomer customer, String postcode, String customerName,
+            String status) throws GenAppManagerException {
         int policyNumber = 1;
         while (inquireCommercialPolicy(customer, policyNumber) != null) {
-            policyNumber ++;
+            policyNumber++;
         }
-
         String defaultId = "0000000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
@@ -477,14 +474,12 @@ public class GenAppImpl implements IGenApp {
                     .positionCursorToFieldContaining("Policy Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Postcode").tab().type(postcode)
-                    .positionCursorToFieldContaining("Customer Name").tab().type(customerName)
-                    .positionCursorToFieldContaining("Status").tab().type(status)
-                    .positionCursorToFieldContaining("Select Option").tab().type("2").enter()
-                    .waitForKeyboard();
-
-            if(terminal.retrieveScreen().contains("Policy Inserted"))
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
+            fillField("Post Code", postcode);
+            fillField("Customer Name", customerName);
+            fillField("Status", status);
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
+            if (terminal.retrieveScreen().contains("Policy Inserted"))
                 return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
             else
                 return null;
@@ -492,7 +487,6 @@ public class GenAppImpl implements IGenApp {
             throw new GenAppManagerException("Issue Adding Commercial Policy", e);
         }
     }
-
     /**
      * A static way to log in to the Application ID that is assigned through the
      * cps.properties
