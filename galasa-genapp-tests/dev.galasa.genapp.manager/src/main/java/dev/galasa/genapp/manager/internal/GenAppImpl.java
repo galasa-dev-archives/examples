@@ -146,9 +146,11 @@ public class GenAppImpl implements IGenApp {
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
                     .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
-            if (terminal.retrieveScreen().contains("No data was returned."))
+            if (terminal.retrieveScreen().contains("No data was returned.")) {
+                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
                 return null;
-
+            }
+        
             String firstName = terminal.retrieveFieldTextAfterFieldWithString("First").trim();
             String lastName = terminal.retrieveFieldTextAfterFieldWithString("Last").trim();
             String dob = terminal.retrieveFieldTextAfterFieldWithString("DOB").trim();
@@ -182,6 +184,8 @@ public class GenAppImpl implements IGenApp {
                     .positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
 
             String customerNum = terminal.retrieveFieldTextAfterFieldWithString("Cust Number");
+
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
             return new CustomerImpl(this, Integer.parseInt(customerNum), "", "", "", "", "", "", "", "", "");
         } catch (InterruptedException | Zos3270Exception e) {
@@ -230,8 +234,10 @@ public class GenAppImpl implements IGenApp {
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
                     .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
-            if (terminal.retrieveScreen().contains("No data was returned."))
+            if (terminal.retrieveScreen().contains("No data was returned.")) {
+                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
                 return null;
+            }
 
             String carMake = terminal.retrieveFieldTextAfterFieldWithString("Postcode").trim();
             String carModel = terminal.retrieveFieldTextAfterFieldWithString("Customer Name").trim();
@@ -297,8 +303,10 @@ public class GenAppImpl implements IGenApp {
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
                     .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
-            if (terminal.retrieveScreen().contains("No data was returned."))
+            if (terminal.retrieveScreen().contains("No data was returned.")) {
+                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
                 return null;
+            }
 
             String fundName = terminal.retrieveFieldTextAfterFieldWithString("Fund Name").trim();
             String lifeAssured = terminal.retrieveFieldTextAfterFieldWithString("Life Assured").trim();
@@ -336,6 +344,7 @@ public class GenAppImpl implements IGenApp {
             fillField("With Profits", withProfits);
             fillField("Equities", equities);
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
             if (terminal.retrieveScreen().contains("Policy Inserted"))
                 return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities,
                         managedFunds);
@@ -359,8 +368,10 @@ public class GenAppImpl implements IGenApp {
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
                     .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
-            if (terminal.retrieveScreen().contains("No data was returned."))
+            if (terminal.retrieveScreen().contains("No data was returned.")) {
+                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
                 return null;
+            }
 
             String propertyType = terminal.retrieveFieldTextAfterFieldWithString("Property Type").trim();
             int bedRooms = Integer.parseInt(terminal.retrieveFieldTextAfterFieldWithString("Bedrooms").trim());
@@ -436,16 +447,18 @@ public class GenAppImpl implements IGenApp {
         String policyId = Integer.toString(policyNumber);
 
         try {
-            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Policy Number").tab()
+            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard();
+            terminal.positionCursorToFieldContaining("Policy Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
                     .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
                     .waitForKeyboard();
             
-            if (terminal.retrieveScreen().contains("No data was returned."))
+            if (terminal.retrieveScreen().contains("No data was returned.")) {
+                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
                 return null;
+            }
 
             String postcode = terminal.retrieveFieldTextAfterFieldWithString("Postcode").trim();
             String customerName = terminal.retrieveFieldTextAfterFieldWithString("Customer Name").trim();
@@ -475,10 +488,11 @@ public class GenAppImpl implements IGenApp {
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
-            fillField("Post Code", postcode);
+            fillField("Postcode", postcode);
             fillField("Customer Name", customerName);
             fillField("Status", status);
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
             if (terminal.retrieveScreen().contains("Policy Inserted"))
                 return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
             else
