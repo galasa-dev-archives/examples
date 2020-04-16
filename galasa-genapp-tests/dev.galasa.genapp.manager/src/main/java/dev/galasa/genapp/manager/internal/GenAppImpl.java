@@ -373,10 +373,8 @@ public class GenAppImpl implements IGenApp {
 
             terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
-            if(terminal.retrieveScreen().contains("Policy Inserted"))
-                return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities, managedFunds);
-            else
-                return null;
+            return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities, managedFunds);
+
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Endowment Policy", e);
         }
@@ -406,7 +404,10 @@ public class GenAppImpl implements IGenApp {
                     .positionCursorToFieldContaining("Select Option").tab().type("2").enter()
                     .waitForKeyboard();
 
-            return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
+            if(terminal.retrieveScreen().contains("Policy Inserted"))
+                return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities, managedFunds);
+            else
+                return null;
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Adding Commercial Policy", e);
         }
