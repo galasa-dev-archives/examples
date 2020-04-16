@@ -16,7 +16,10 @@ import dev.galasa.genapp.manager.IMotorPolicy;
 import dev.galasa.genapp.manager.internal.MotorPolicyImpl;
 import dev.galasa.zos.IZosImage;
 import dev.galasa.zos.ZosManagerException;
+import dev.galasa.zos3270.FieldNotFoundException;
 import dev.galasa.zos3270.ITerminal;
+import dev.galasa.zos3270.KeyboardLockedException;
+import dev.galasa.zos3270.TextNotFoundException;
 import dev.galasa.zos3270.Zos3270Exception;
 
 public class GenAppImpl implements IGenApp {
@@ -30,7 +33,8 @@ public class GenAppImpl implements IGenApp {
     private final String PREFIX = "GENAPP";
 
     /**
-     * These variables are referring to the JSON-requests that are allowed by the GenApp installation
+     * These variables are referring to the JSON-requests that are allowed by the
+     * GenApp installation
      */
     private final String getCustomer = "getCustomerDetails";
     private final String addCustomer = "addCustomerDetails";
@@ -127,7 +131,9 @@ public class GenAppImpl implements IGenApp {
     }
 
     /**
-     * Interacting with GenApp through its 3270-connection to be able to inquire a specific customer through its unique identifier ID
+     * Interacting with GenApp through its 3270-connection to be able to inquire a
+     * specific customer through its unique identifier ID
+     * 
      * @throws GenAppManagerException
      */
     public ICustomer inquireCustomer(int id) throws GenAppManagerException {
@@ -138,8 +144,7 @@ public class GenAppImpl implements IGenApp {
             terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard()
                     .positionCursorToFieldContaining("Cust Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
-                    .waitForKeyboard();
+                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("No data was returned."))
                 return null;
@@ -166,7 +171,9 @@ public class GenAppImpl implements IGenApp {
     }
 
     /**
-     * Interacting with GenApp through its 3270-connection to be able to add a clean new customer
+     * Interacting with GenApp through its 3270-connection to be able to add a clean
+     * new customer
+     * 
      * @throws GenAppManagerException
      */
     public ICustomer addCustomer() throws GenAppManagerException {
@@ -183,35 +190,29 @@ public class GenAppImpl implements IGenApp {
     }
 
     /**
-     * Interacting with GenApp through its 3270-connection to update a specific value of the GenApp-data
+     * Interacting with GenApp through its 3270-connection to update a specific
+     * value of the GenApp-data
+     * 
      * @throws GenAppManagerException
      */
     public ICustomer updateCustomer(ICustomer customer, String field, String value) throws GenAppManagerException {
         try {
             String defaultId = "0000000000";
-            String defaultValue = "          ";
 
             String customerId = Integer.toString(customer.getCustomerNumber());
 
             terminal.positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0,defaultId.length()-customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab()
-                    .type("4").enter().waitForKeyboard();
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Select Option").tab().type("4").enter().waitForKeyboard();
 
-            int fieldLength = terminal.retrieveFieldTextAfterFieldWithString(field).length();
-            if(value.length() > fieldLength)
-                throw new GenAppManagerException("Value " + value + " too long for field " + field + ". Must be " + fieldLength + " or fewer characters");
-
-            String extendedValue = value + defaultValue.substring(value.length(), fieldLength);
-            
-            terminal.positionCursorToFieldContaining(field).tab()
-                    .type(extendedValue).enter().waitForKeyboard();
+            fillField(field, value);
+            terminal.enter().waitForKeyboard();
 
             terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
             return inquireCustomer(customer.getCustomerNumber());
-            
-        } catch(InterruptedException | Zos3270Exception e) {
+
+        } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Adding Customer", e);
         }
     }
@@ -227,9 +228,8 @@ public class GenAppImpl implements IGenApp {
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
-                    .waitForKeyboard();
-            
+                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
+
             if (terminal.retrieveScreen().contains("No data was returned."))
                 return null;
 
@@ -249,7 +249,7 @@ public class GenAppImpl implements IGenApp {
 
     public IMotorPolicy createMotorPolicy(ICustomer customer, String carMake, String carModel, int carValue, String carRegistration) throws GenAppManagerException {
         int policyNumber = 0;
-        while(inquireMotorPolicy(customer, policyNumber) != null) {
+        while (inquireMotorPolicy(customer, policyNumber) != null) {
             policyNumber++;
         }
 
@@ -264,17 +264,14 @@ public class GenAppImpl implements IGenApp {
                     .positionCursorToFieldContaining("Policy Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Car Make").tab()
-                    .type(carMake)
-                    .positionCursorToFieldContaining("Car Model").tab()
-                    .type(carModel)
-                    .positionCursorToFieldContaining("Car Value").tab()
-                    .type(defaultValue.substring(0, defaultValue.length() - carValueStr.length()) + carValueStr)
-                    .positionCursorToFieldContaining("Select Option").tab().type("2").enter()
-                    .waitForKeyboard();
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
 
-                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+            fillField("Car Value", defaultValue.substring(0, defaultValue.length() - carValueStr.length()) + carValueStr);
+            fillField("Car Make", carMake);
+            fillField("Car Model", carModel);
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
+
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
             if (!terminal.retrieveScreen().contains("New Motor Policy Inserted")) {
                 return null;
@@ -298,9 +295,8 @@ public class GenAppImpl implements IGenApp {
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
-                    .waitForKeyboard();
-            
+                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
+
             if (terminal.retrieveScreen().contains("No data was returned."))
                 return null;
 
@@ -363,9 +359,8 @@ public class GenAppImpl implements IGenApp {
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
-                    .waitForKeyboard();
-            
+                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
+
             if (terminal.retrieveScreen().contains("No data was returned."))
                 return null;
 
@@ -405,22 +400,23 @@ public class GenAppImpl implements IGenApp {
                     .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
                     .positionCursorToFieldContaining("Cust Number").tab()
                     .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Property Type").tab()
-                    .type(propertyType)
                     .positionCursorToFieldContaining("Bedrooms").tab()
                     .type(defaultBedrooms.substring(0, defaultBedrooms.length() - bedroomsStr.length()) + bedroomsStr)
                     .positionCursorToFieldContaining("House Value").tab()
-                    .type(defaultValue.substring(0, defaultValue.length() - houseValueStr.length()) + houseValueStr)
-                    .positionCursorToFieldContaining("House Name").tab()
-                    .type(houseName)
-                    .positionCursorToFieldContaining("House Number").tab()
-                    .type(houseNumber)
-                    .positionCursorToFieldContaining("Postcode").tab()
-                    .type(postcode)
-                    .positionCursorToFieldContaining("Select Option").tab().type("2").enter()
+                    .type(defaultValue.substring(0, defaultValue.length() - houseValueStr.length()) + houseValueStr);
+                    
+
+            fillField("Property Type", propertyType);
+            fillField("House Name", houseName);
+            fillField("House Number", houseNumber);
+            fillField("Postcode", postcode);
+
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter()
                     .waitForKeyboard();
 
-                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+                
+
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
             if (!terminal.retrieveScreen().contains("New Motor Policy Inserted")) {
                 return null;
@@ -498,26 +494,38 @@ public class GenAppImpl implements IGenApp {
     }
 
     /**
-     * A static way to log in to the Application ID that is assigned through the cps.properties
+     * A static way to log in to the Application ID that is assigned through the
+     * cps.properties
+     * 
      * @throws GenAppManagerException
      */
     private void logon() throws GenAppManagerException {
         try {
-            terminal.waitForKeyboard()
-                    .type("logon applid(" + this.applID + ")")
-                    .enter().waitForTextInField("Userid")
-                    .pf3().waitForTextInField("Sign-on is terminated")
-                    .clear().waitForKeyboard()
-			        .type("cesl").enter().waitForTextInField("Userid")
-			        .positionCursorToFieldContaining("Userid").tab()
-			        .type(creds.getUsername())
-			        .positionCursorToFieldContaining("Password").tab()
-			        .type(creds.getPassword())
-			        .enter().waitForKeyboard()
-			        .clear().waitForKeyboard();
-		} catch (InterruptedException | Zos3270Exception e) {
-			throw new GenAppManagerException("Issue logging into GenApp", e);
-		}
+            terminal.waitForKeyboard().type("logon applid(" + this.applID + ")").enter().waitForTextInField("Userid")
+                    .pf3().waitForTextInField("Sign-on is terminated").clear().waitForKeyboard().type("cesl").enter()
+                    .waitForTextInField("Userid").positionCursorToFieldContaining("Userid").tab()
+                    .type(creds.getUsername()).positionCursorToFieldContaining("Password").tab()
+                    .type(creds.getPassword()).enter().waitForKeyboard().clear().waitForKeyboard();
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue logging into GenApp", e);
+        }
+    }
+
+    private void fillField(String field, String value)
+            throws TextNotFoundException, GenAppManagerException, FieldNotFoundException, KeyboardLockedException {
+        int fieldLength = terminal.retrieveFieldTextAfterFieldWithString(field).length();
+        if(value.length() > fieldLength)
+            throw new GenAppManagerException("Value " + value + " too long for field " + field + ". Must be " + fieldLength + " or fewer characters");
+
+        StringBuffer defaultBuffer = new StringBuffer();
+        while(defaultBuffer.length() < fieldLength) {
+            defaultBuffer.append(" ");
+        }
+
+        String extendedValue = value + defaultBuffer.toString().substring(value.length(), fieldLength);
+        
+        terminal.positionCursorToFieldContaining(field).tab()
+                .type(extendedValue);
     }
 
 }
