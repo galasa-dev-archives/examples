@@ -203,9 +203,9 @@ public class CustomerImpl implements ICustomer {
     }
 
     @Override
-    public IMotorPolicy createMotorPolicy(String carMake, String carModel, int value, String registration) {
-        // TODO Auto-generated method stub
-        return null;
+    public IMotorPolicy createMotorPolicy(String carMake, String carModel, int carValue, String carRegistration)
+            throws GenAppManagerException {
+        return genApp.addMotorPolicy(this, carMake, carModel, carValue, carRegistration);
     }
 
 }

@@ -51,6 +51,6 @@ public interface ICustomer {
 
     public IHousePolicy createHousePolicy(String propertyType, int bedrooms, int value, String houseName, String houseNumber, String postcode);
 
-    public IMotorPolicy createMotorPolicy(String carMake, String carModel, int value, String registration);
+    public IMotorPolicy createMotorPolicy(String carMake, String carModel, int value, String registration) throws GenAppManagerException;
 
 }
