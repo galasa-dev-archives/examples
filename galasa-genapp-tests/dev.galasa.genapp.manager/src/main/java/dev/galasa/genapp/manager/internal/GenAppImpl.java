@@ -1,6 +1,5 @@
 package dev.galasa.genapp.manager.internal;
 
-import java.nio.charset.Charset;
 import java.util.Random;
 
 import dev.galasa.ICredentialsUsernamePassword;
@@ -13,7 +12,6 @@ import dev.galasa.genapp.manager.IEndowmentPolicy;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.genapp.manager.IHousePolicy;
 import dev.galasa.genapp.manager.IMotorPolicy;
-import dev.galasa.genapp.manager.internal.MotorPolicyImpl;
 import dev.galasa.zos.IZosImage;
 import dev.galasa.zos.ZosManagerException;
 import dev.galasa.zos3270.FieldNotFoundException;
@@ -137,14 +135,12 @@ public class GenAppImpl implements IGenApp {
      * @throws GenAppManagerException
      */
     public ICustomer inquireCustomer(int id) throws GenAppManagerException {
-        String defaultId = "0000000000";
         String customerId = Integer.toString(id);
 
         try {
-            terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
+            terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard();
+            fillField("Cust Number", customerId, '0');
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("No data was returned.")) {
                 terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
@@ -201,16 +197,13 @@ public class GenAppImpl implements IGenApp {
      */
     public ICustomer updateCustomer(ICustomer customer, String field, String value) throws GenAppManagerException {
         try {
-            String defaultId = "0000000000";
-
             String customerId = Integer.toString(customer.getCustomerNumber());
 
-            terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("4").enter().waitForKeyboard();
+            terminal.waitForKeyboard().type("ssc1").enter().waitForKeyboard();
+            fillField("Cust Number", customerId, '0');
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("4").enter().waitForKeyboard();
 
-            fillField(field, value);
+            fillField(field, value, ' ');
             terminal.enter().waitForKeyboard();
 
             terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
@@ -223,17 +216,14 @@ public class GenAppImpl implements IGenApp {
     }
 
     public IMotorPolicy inquireMotorPolicy(ICustomer customer, int policyNumber) throws GenAppManagerException {
-        String defaultId = "0000000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
 
         try {
-            terminal.waitForKeyboard().type("ssp1").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Policy Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
+            terminal.waitForKeyboard().type("ssp1").enter().waitForKeyboard();
+            fillField("Policy Number", policyId, '0');
+            fillField("Cust Number", customerId, '0');
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("No data was returned.")) {
                 terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
@@ -259,23 +249,17 @@ public class GenAppImpl implements IGenApp {
         while (inquireMotorPolicy(customer, policyNumber) != null) {
             policyNumber++;
         }
-
-        String defaultId = "0000000000";
-        String defaultValue = "000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
         String carValueStr = Integer.toString(carValue);
 
         try {
-            terminal.waitForKeyboard().type("ssp1").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Policy Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
-
-            fillField("Car Value", defaultValue.substring(0, defaultValue.length() - carValueStr.length()) + carValueStr);
-            fillField("Car Make", carMake);
-            fillField("Car Model", carModel);
+            terminal.waitForKeyboard().type("ssp1").enter().waitForKeyboard();
+            fillField("Policy Number", policyId, '0');
+            fillField("Cust Number", customerId, '0');
+            fillField("Car Value", carValueStr, '0');
+            fillField("Car Make", carMake, ' ');
+            fillField("Car Model", carModel, ' ');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
 
             terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
@@ -292,17 +276,14 @@ public class GenAppImpl implements IGenApp {
 
     public IEndowmentPolicy inquireEndowmentPolicy(ICustomer customer, int policyNumber)
             throws GenAppManagerException {
-        String defaultId = "0000000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
 
         try {
-            terminal.waitForKeyboard().type("ssp2").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Policy Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
+            terminal.waitForKeyboard().type("ssp2").enter().waitForKeyboard();
+            fillField("Policy Number", policyId, '0');
+            fillField("Cust Number", customerId, '0');
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("No data was returned.")) {
                 terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
@@ -331,19 +312,16 @@ public class GenAppImpl implements IGenApp {
         while (inquireEndowmentPolicy(customer, policyNumber) != null) {
             policyNumber++;
         }
-        String defaultId = "0000000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
         try {
-            terminal.waitForKeyboard().type("ssp2").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Policy Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
-            fillField("Fund Name", fundName);
-            fillField("Life Assured", lifeAssured);
-            fillField("With Profits", withProfits);
-            fillField("Equities", equities);
+            terminal.waitForKeyboard().type("ssp2").enter().waitForKeyboard();
+            fillField("Policy Number", policyId, '0');
+            fillField("Cust Number", customerId, '0');
+            fillField("Fund Name", fundName, ' ');
+            fillField("Life Assured", lifeAssured, ' ');
+            fillField("With Profits", withProfits, ' ');
+            fillField("Equities", equities, ' ');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
             terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
             if (terminal.retrieveScreen().contains("Policy Inserted"))
@@ -357,17 +335,14 @@ public class GenAppImpl implements IGenApp {
     }
 
     public IHousePolicy inquireHousePolicy(ICustomer customer, int policyNumber) throws GenAppManagerException {
-        String defaultId = "0000000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
 
         try {
-            terminal.waitForKeyboard().type("ssp3").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Policy Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
+            terminal.waitForKeyboard().type("ssp3").enter().waitForKeyboard();
+            fillField("Policy Number", policyId, '0');
+            fillField("Cust Number", customerId, '0');
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter().waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("No data was returned.")) {
                 terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
@@ -395,36 +370,24 @@ public class GenAppImpl implements IGenApp {
         while(inquireHousePolicy(customer, policyNumber) != null) {
             policyNumber++;
         }
-
-        String defaultId = "0000000000";
-        String defaultBedrooms = "000";
-        String defaultValue = "00000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
         String bedroomsStr = Integer.toString(bedRooms);
         String houseValueStr = Integer.toString(houseValue);
 
         try {
-            terminal.waitForKeyboard().type("ssp3").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Policy Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Bedrooms").tab()
-                    .type(defaultBedrooms.substring(0, defaultBedrooms.length() - bedroomsStr.length()) + bedroomsStr)
-                    .positionCursorToFieldContaining("House Value").tab()
-                    .type(defaultValue.substring(0, defaultValue.length() - houseValueStr.length()) + houseValueStr);
-                    
-
-            fillField("Property Type", propertyType);
-            fillField("House Name", houseName);
-            fillField("House Number", houseNumber);
-            fillField("Postcode", postcode);
+            terminal.waitForKeyboard().type("ssp3").enter().waitForKeyboard();
+            fillField("Policy Number", policyId, '0');
+            fillField("Cust Number", customerId, '0');
+            fillField("Bedrooms", bedroomsStr, '0');
+            fillField("House Value", houseValueStr, '0');
+            fillField("Property Type", propertyType, ' ');
+            fillField("House Name", houseName, ' ');
+            fillField("House Number", houseNumber, ' ');
+            fillField("Postcode", postcode, ' ');
 
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter()
                     .waitForKeyboard();
-
-                
 
             terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
 
@@ -443,17 +406,14 @@ public class GenAppImpl implements IGenApp {
 
     public ICommercialPolicy inquireCommercialPolicy(ICustomer customer, int policyNumber)
             throws GenAppManagerException {
-        String defaultId = "0000000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
 
         try {
             terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard();
-            terminal.positionCursorToFieldContaining("Policy Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
-                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
+            fillField("Policy Number", policyId, '0');
+            fillField("Cust Number", customerId, '0');
+            terminal.positionCursorToFieldContaining("Select Option").tab().type("1").enter()
                     .waitForKeyboard();
             
             if (terminal.retrieveScreen().contains("No data was returned.")) {
@@ -480,18 +440,15 @@ public class GenAppImpl implements IGenApp {
         while (inquireCommercialPolicy(customer, policyNumber) != null) {
             policyNumber++;
         }
-        String defaultId = "0000000000";
         String customerId = Integer.toString(customer.getCustomerNumber());
         String policyId = Integer.toString(policyNumber);
         try {
-            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard()
-                    .positionCursorToFieldContaining("Policy Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
-                    .positionCursorToFieldContaining("Cust Number").tab()
-                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId);
-            fillField("Postcode", postcode);
-            fillField("Customer Name", customerName);
-            fillField("Status", status);
+            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard();
+            fillField("Policy Number", policyId, '0');
+            fillField("Cust Number", customerId, '0');
+            fillField("Postcode", postcode, ' ');
+            fillField("Customer Name", customerName, ' ');
+            fillField("Status", status, ' ');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
             terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
             if (terminal.retrieveScreen().contains("Policy Inserted"))
@@ -520,21 +477,25 @@ public class GenAppImpl implements IGenApp {
         }
     }
 
-    private void fillField(String field, String value)
+    private void fillField(String field, String value, Character baseChar)
             throws TextNotFoundException, GenAppManagerException, FieldNotFoundException, KeyboardLockedException {
         int fieldLength = terminal.retrieveFieldTextAfterFieldWithString(field).length();
         if(value.length() > fieldLength)
             throw new GenAppManagerException("Value " + value + " too long for field " + field + ". Must be " + fieldLength + " or fewer characters");
 
+        String extendedValue = "";
         StringBuffer defaultBuffer = new StringBuffer();
         while(defaultBuffer.length() < fieldLength) {
-            defaultBuffer.append(" ");
+            defaultBuffer.append(baseChar);
         }
 
-        String extendedValue = value + defaultBuffer.toString().substring(value.length(), fieldLength);
+        if(baseChar == ' ') {
+            extendedValue = value + defaultBuffer.toString().substring(value.length(), fieldLength);
+        } else if(baseChar == '0') {
+            extendedValue = defaultBuffer.toString().substring(0, defaultBuffer.toString().length() - value.length()) + value;
+        }
         
-        terminal.positionCursorToFieldContaining(field).tab()
-                .type(extendedValue);
+        terminal.positionCursorToFieldContaining(field).tab().type(extendedValue);
     }
 
 }
