@@ -204,7 +204,7 @@ public class CustomerImpl implements ICustomer {
     @Override
     public IMotorPolicy createMotorPolicy(String carMake, String carModel, int carValue, String carRegistration)
             throws GenAppManagerException {
-        return genApp.addMotorPolicy(this, carMake, carModel, carValue, carRegistration);
+        return genApp.createMotorPolicy(this, carMake, carModel, carValue, carRegistration);
     }
 
 }
