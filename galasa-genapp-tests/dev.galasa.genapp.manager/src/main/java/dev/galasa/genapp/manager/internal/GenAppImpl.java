@@ -9,6 +9,7 @@ import dev.galasa.framework.spi.IFramework;
 import dev.galasa.genapp.manager.GenAppManagerException;
 import dev.galasa.genapp.manager.ICommercialPolicy;
 import dev.galasa.genapp.manager.ICustomer;
+import dev.galasa.genapp.manager.IEndowmentPolicy;
 import dev.galasa.genapp.manager.IGenApp;
 import dev.galasa.zos.IZosImage;
 import dev.galasa.zos.ZosManagerException;
@@ -234,11 +235,109 @@ public class GenAppImpl implements IGenApp {
             String customerName = terminal.retrieveFieldTextAfterFieldWithString("Customer Name").trim();
             String status = terminal.retrieveFieldTextAfterFieldWithString("Status").trim();
 
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+
             return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
         }
 
+    }
+
+    public ICommercialPolicy createCommercialPolicy(ICustomer customer, String postcode, String customerName, String status)
+            throws GenAppManagerException {
+        int policyNumber = 1;
+        while (inquireCommercialPolicy(customer, policyNumber) != null) {
+            policyNumber ++;
+        }
+
+        String defaultId = "0000000000";
+        String customerId = Integer.toString(customer.getCustomerNumber());
+        String policyId = Integer.toString(policyNumber);
+        try {
+            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Policy Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Postcode").tab().type(postcode)
+                    .positionCursorToFieldContaining("Customer Name").tab().type(customerName)
+                    .positionCursorToFieldContaining("Status").tab().type(status)
+                    .positionCursorToFieldContaining("Select Option").tab().type("2").enter()
+                    .waitForKeyboard();
+
+            if(terminal.retrieveScreen().contains("Policy Inserted"))
+                return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
+            else
+                return null;
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Adding Commercial Policy", e);
+        }
+    }
+
+    public IEndowmentPolicy inquireEndowmentPolicy(ICustomer customer, int policyNumber)
+            throws GenAppManagerException {
+        String defaultId = "0000000000";
+        String customerId = Integer.toString(customer.getCustomerNumber());
+        String policyId = Integer.toString(policyNumber);
+
+        try {
+            terminal.waitForKeyboard().type("ssp2").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Policy Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
+                    .waitForKeyboard();
+            
+            if (terminal.retrieveScreen().contains("No data was returned."))
+                return null;
+
+            String fundName = terminal.retrieveFieldTextAfterFieldWithString("Fund Name").trim();
+            String lifeAssured = terminal.retrieveFieldTextAfterFieldWithString("Life Assured").trim();
+            String withProfits = terminal.retrieveFieldTextAfterFieldWithString("With Profits").trim();
+            String equities = terminal.retrieveFieldTextAfterFieldWithString("Equities").trim();
+            String managedFunds = terminal.retrieveFieldTextAfterFieldWithString("Managed Funds").trim();
+
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+
+            if(terminal.retrieveScreen().contains("Policy Inserted"))
+                return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities, managedFunds);
+            else
+                return null;
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Inquiring Endowment Policy", e);
+        }
+
+    }
+
+    public IEndowmentPolicy createEndowmentPolicy(ICustomer customer, String fundName, String lifeAssured, 
+            String withProfits, String equities, String managedFunds) throws GenAppManagerException {
+        int policyNumber = 1;
+        while (inquireEndowmentPolicy(customer, policyNumber) != null) {
+            policyNumber ++;
+        }
+
+        String defaultId = "0000000000";
+        String customerId = Integer.toString(customer.getCustomerNumber());
+        String policyId = Integer.toString(policyNumber);
+        try {
+            terminal.waitForKeyboard().type("ssp2").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Policy Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Fund Name").tab().type(fundName)
+                    .positionCursorToFieldContaining("Life Assured").tab().type(lifeAssured)
+                    .positionCursorToFieldContaining("With Profits").tab().type(withProfits)
+                    .positionCursorToFieldContaining("Equities").tab().type(equities)
+                    .positionCursorToFieldContaining("Select Option").tab().type("2").enter()
+                    .waitForKeyboard();
+
+            return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Adding Commercial Policy", e);
+        }
     }
 
     /**

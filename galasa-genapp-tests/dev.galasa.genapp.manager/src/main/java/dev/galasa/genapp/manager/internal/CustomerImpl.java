@@ -183,16 +183,15 @@ public class CustomerImpl implements ICustomer {
     }
 
     @Override
-    public ICommercialPolicy createCommercialPolicy(String postcode, String CustomerName, String status) {
-        // TODO Auto-generated method stub
-        return null;
+    public ICommercialPolicy createCommercialPolicy(String postcode, String customerName, String status)
+            throws GenAppManagerException {
+        return genApp.createCommercialPolicy(this, postcode, customerName, status);
     }
 
     @Override
     public IEndowmentPolicy createEndowmentPolicy(String fundName, String lifeAssured, String withProfits,
-            String equities, String managedFunds) {
-        // TODO Auto-generated method stub
-        return null;
+            String equities, String managedFunds) throws GenAppManagerException {
+        return genApp.createEndowmentPolicy(this, fundName, lifeAssured, withProfits, equities, managedFunds);
     }
 
     @Override
