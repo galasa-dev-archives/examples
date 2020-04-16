@@ -10,6 +10,8 @@ import dev.galasa.genapp.manager.GenAppManagerException;
 import dev.galasa.genapp.manager.ICommercialPolicy;
 import dev.galasa.genapp.manager.ICustomer;
 import dev.galasa.genapp.manager.IGenApp;
+import dev.galasa.genapp.manager.IMotorPolicy;
+import dev.galasa.genapp.manager.internal.properties.MotorPolicyImpl;
 import dev.galasa.zos.IZosImage;
 import dev.galasa.zos.ZosManagerException;
 import dev.galasa.zos3270.ITerminal;
@@ -209,6 +211,76 @@ public class GenAppImpl implements IGenApp {
             
         } catch(InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue Adding Customer", e);
+        }
+    }
+
+    public IMotorPolicy inquireMotorPolicy(ICustomer customer, int policyNumber) throws GenAppManagerException {
+        String defaultId = "0000000000";
+        String customerId = Integer.toString(customer.getCustomerNumber());
+        String policyId = Integer.toString(policyNumber);
+
+        try {
+            terminal.waitForKeyboard().type("ssp1").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Policy Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Select Option").tab().type("1").enter()
+                    .waitForKeyboard();
+            
+            if (terminal.retrieveScreen().contains("No data was returned."))
+                return null;
+
+            String carMake = terminal.retrieveFieldTextAfterFieldWithString("Postcode").trim();
+            String carModel = terminal.retrieveFieldTextAfterFieldWithString("Customer Name").trim();
+            int carValue = Integer.parseInt(terminal.retrieveFieldTextAfterFieldWithString("Status").trim());
+            String carRegistration = terminal.retrieveFieldTextAfterFieldWithString("Registration").trim();
+
+            terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+
+            return new MotorPolicyImpl(customer, policyId, carMake, carModel, carValue , carRegistration);
+
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
+        }
+    }
+
+    public IMotorPolicy addMotorPolicy(ICustomer customer, String carMake, String carModel, int carValue, String carRegistration) throws GenAppManagerException {
+        int policyNumber = 0;
+        while(inquireMotorPolicy(customer, policyNumber) != null) {
+            policyNumber++;
+        }
+
+        String defaultId = "0000000000";
+        String defaultValue = "000000";
+        String customerId = Integer.toString(customer.getCustomerNumber());
+        String policyId = Integer.toString(policyNumber);
+        String carValueStr = Integer.toString(carValue);
+
+        try {
+            terminal.waitForKeyboard().type("ssp4").enter().waitForKeyboard()
+                    .positionCursorToFieldContaining("Policy Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - policyId.length()) + policyId)
+                    .positionCursorToFieldContaining("Cust Number").tab()
+                    .type(defaultId.substring(0, defaultId.length() - customerId.length()) + customerId)
+                    .positionCursorToFieldContaining("Car Make").tab()
+                    .type(carMake)
+                    .positionCursorToFieldContaining("Car Model").tab()
+                    .type(carModel)
+                    .positionCursorToFieldContaining("Car Value").tab()
+                    .type(defaultValue.substring(0, defaultValue.length() - carValueStr.length()) + carValueStr)
+                    .positionCursorToFieldContaining("Select Option").tab().type("2").enter()
+                    .waitForKeyboard();
+
+                terminal.pf3().waitForKeyboard().clear().waitForKeyboard();
+
+            if (!terminal.retrieveScreen().contains("New Motor Policy Inserted")) {
+                return null;
+            }
+
+            return new MotorPolicyImpl(customer, policyId, carMake, carModel, carValue , carRegistration);
+        } catch (InterruptedException | Zos3270Exception e) {
+            throw new GenAppManagerException("Issue Inquiring Commercial Policy", e);
         }
     }
 
