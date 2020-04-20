@@ -176,6 +176,8 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
 
     @GenerateAnnotatedField(annotation = Customer.class)
     public ICustomer generateCustomer(Field field, List<Annotation> annotations) throws GenAppManagerException {
+        if(this.genapp == null)
+            generateGenApp(null, null);
         Customer custAnnotation = field.getAnnotation(Customer.class);
         int customerId = custAnnotation.userID();
         if(customerId != 0) {

@@ -55,7 +55,7 @@ public class EndowmentPolicyImpl implements IEndowmentPolicy {
 
     @Override
     public String getManagedFunds() {
-        return this.getManagedFunds();
+        return this.managedFunds;
     }
 
 

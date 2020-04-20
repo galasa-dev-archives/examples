@@ -1,6 +1,5 @@
 package dev.galasa.genapp.manager.internal;
 
-import java.nio.charset.Charset;
 import java.util.Random;
 
 import dev.galasa.genapp.manager.IBasicGenApp;

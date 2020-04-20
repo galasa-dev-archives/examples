@@ -445,11 +445,16 @@ public class GenAppImpl implements IGenApp {
      */
     private void logon() throws GenAppManagerException {
         try {
-            terminal.waitForKeyboard().type("logon applid(" + this.applID + ")").enter().waitForTextInField("Userid")
-                    .pf3().waitForTextInField("Sign-on is terminated").clear().waitForKeyboard().type("cesl").enter()
-                    .waitForTextInField("Userid").positionCursorToFieldContaining("Userid").tab()
-                    .type(creds.getUsername()).positionCursorToFieldContaining("Password").tab()
-                    .type(creds.getPassword()).enter().waitForKeyboard().clear().waitForKeyboard();
+            terminal.waitForKeyboard();
+            if(terminal.retrieveScreen().contains("VAMP")) {
+                terminal.type("logon applid(" + this.applID + ")").enter().waitForTextInField("Userid")
+                        .pf3().waitForTextInField("Sign-on is terminated").clear().waitForKeyboard().type("cesl").enter()
+                        .waitForTextInField("Userid").positionCursorToFieldContaining("Userid").tab()
+                        .type(creds.getUsername()).positionCursorToFieldContaining("Password").tab()
+                        .type(creds.getPassword()).enter().waitForKeyboard().clear().waitForKeyboard();
+            } else {
+                throw new GenAppManagerException("Login type not supported");
+            }
         } catch (InterruptedException | Zos3270Exception e) {
             throw new GenAppManagerException("Issue logging into GenApp", e);
         }
