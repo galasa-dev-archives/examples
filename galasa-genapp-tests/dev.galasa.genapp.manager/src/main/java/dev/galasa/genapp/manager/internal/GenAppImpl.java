@@ -452,6 +452,9 @@ public class GenAppImpl implements IGenApp {
                         .waitForTextInField("Userid").positionCursorToFieldContaining("Userid").tab()
                         .type(creds.getUsername()).positionCursorToFieldContaining("Password").tab()
                         .type(creds.getPassword()).enter().waitForKeyboard().clear().waitForKeyboard();
+            } else if(terminal.retrieveScreen().contains("LOGON APPLID()")) {
+                terminal.type("logon applid(" + this.applID + ")").enter()
+                        .waitForKeyboard().clear().waitForKeyboard();
             } else {
                 throw new GenAppManagerException("Login type not supported");
             }
