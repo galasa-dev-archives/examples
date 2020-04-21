@@ -447,11 +447,16 @@ public class GenAppImpl implements IGenApp {
         try {
             terminal.waitForKeyboard();
             if(terminal.retrieveScreen().contains("VAMP")) {
-                terminal.type("logon applid(" + this.applID + ")").enter().waitForTextInField("Userid")
+                terminal.type("logon applid(" + this.applID + ")").enter();
+                if(!terminal.retrieveScreen().contains(this.applID + " FAILED")) {
+                    terminal.waitForTextInField("Userid")
                         .pf3().waitForTextInField("Sign-on is terminated").clear().waitForKeyboard().type("cesl").enter()
                         .waitForTextInField("Userid").positionCursorToFieldContaining("Userid").tab()
                         .type(creds.getUsername()).positionCursorToFieldContaining("Password").tab()
                         .type(creds.getPassword()).enter().waitForKeyboard().clear().waitForKeyboard();
+                }else {
+                    throw new GenAppManagerException("Failed to logon to " + this.applID);
+                }
             } else if(terminal.retrieveScreen().contains("LOGON APPLID()")) {
                 terminal.type("logon applid(" + this.applID + ")").enter()
                         .waitForKeyboard().clear().waitForKeyboard();
