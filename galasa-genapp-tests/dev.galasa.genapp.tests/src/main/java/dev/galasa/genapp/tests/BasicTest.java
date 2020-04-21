@@ -63,7 +63,7 @@ public class BasicTest {
     public IBasicGenApp genApp;
 
     @Test
-    public void test() throws CoreManagerException, InterruptedException, Zos3270Exception, TestBundleResourceException,
+    public void basicWebservices() throws CoreManagerException, InterruptedException, Zos3270Exception, TestBundleResourceException,
             JsonSyntaxException, IOException, HttpClientException, URISyntaxException {
         // Coupling the URI of GenApp to this instance of the Http-client
         client.setURI(new URI(genApp.getBaseAddress()));
