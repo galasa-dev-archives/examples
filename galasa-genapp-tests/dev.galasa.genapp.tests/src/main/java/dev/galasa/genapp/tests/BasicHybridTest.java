@@ -8,16 +8,14 @@ package dev.galasa.genapp.tests;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
+import dev.galasa.BeforeClass;
 import dev.galasa.ICredentialsUsernamePassword;
 import dev.galasa.Test;
 import dev.galasa.artifact.BundleResources;
@@ -69,13 +67,17 @@ public class BasicHybridTest {
     @DockerContainer(image = "lukasmarivoet/genapp-spring:latest")
     public IDockerContainer container;
 
+    @BeforeClass
+    public void waitForRestService() throws InterruptedException {
+        Thread.sleep(5000);
+    }
+
     @Test
     public void basicHybridTest() throws CoreManagerException, InterruptedException, Zos3270Exception, TestBundleResourceException,
             JsonSyntaxException, IOException, HttpClientException, URISyntaxException , DockerManagerException{
-        InetSocketAddress socket = container.getFirstSocketForExposedPort("80/tcp");
+        InetSocketAddress socket = container.getFirstSocketForExposedPort("8080/tcp");
         client.setURI(new URI("http://" + socket.getAddress().getHostName() + ":" + socket.getPort()));
 
-        String provisionedName = genApp.provisionCustomerName();
         String defaultId = "0000000000";
 
         JsonObject addResponseBody = client.postJson("addcustomer?host=" + genApp.getBaseAddress(), new JsonObject()).getContent();
@@ -86,15 +88,13 @@ public class BasicHybridTest {
                 .getAsJsonObject();
 
         // Ensuring that the http-response actually contains user as requested
-        assertThat(ca.get("ca_first_name").getAsString()).isEqualTo(provisionedName);
-        assertThat(ca.get("ca_last_name").getAsString()).isEqualTo(provisionedName);
+        assertThat(ca.get("ca_first_name").getAsString()).isEqualTo("");
+        assertThat(ca.get("ca_last_name").getAsString()).isEqualTo("");
 
         // Ensuring that the added customer is also available through 3270-terminal
         loginToSCC1();
 
         inquireCustomer(customerId);
-
-        assertThat(terminal.retrieveScreen()).contains(provisionedName);
 
         String updateProvisionedName = genApp.provisionCustomerName();
 
@@ -111,6 +111,14 @@ public class BasicHybridTest {
         inquireCustomer(customerId);
 
         assertThat(terminal.retrieveScreen()).contains(updateProvisionedName);
+
+        JsonObject inquireAfterUpdateResponseBody = client.postJson("inquirecustomer?host=" + genApp.getBaseAddress() + "&id=" + customerId , new JsonObject()).getContent();
+        JsonObject caAfterUpdate = inquireAfterUpdateResponseBody.get("LGICUS01OperationResponse").getAsJsonObject().get("ca")
+                .getAsJsonObject();
+
+        // Ensuring that the http-response actually contains user as requested
+        assertThat(caAfterUpdate.get("ca_first_name").getAsString()).isEqualTo(updateProvisionedName);
+        assertThat(caAfterUpdate.get("ca_last_name").getAsString()).isEqualTo(updateProvisionedName);
     }
 
     private void loginToSCC1() throws InterruptedException, CoreManagerException, Zos3270Exception {
