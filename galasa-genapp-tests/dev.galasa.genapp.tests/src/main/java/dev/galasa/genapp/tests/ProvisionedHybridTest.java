@@ -53,9 +53,11 @@ public class ProvisionedHybridTest {
     @StoredArtifactRoot
     public Path artifactRoot;
 
+    // Docker image that contains a running Spring-instance that talks to the Genapp webservice
     @DockerContainer(image = "lukasmarivoet/genapp-spring:latest")
     public IDockerContainer container;
 
+    // Necessary to allow the Spring service to boot up and expose its 80 TCP port
     @BeforeClass
     public void waitForRestService() throws InterruptedException {
         Thread.sleep(5000);
@@ -64,9 +66,10 @@ public class ProvisionedHybridTest {
     @Test
     public void prosivionedAccountTest() throws GenAppManagerException, URISyntaxException, TestBundleResourceException,
             JsonSyntaxException, IOException, HttpClientException {
-        //Generate a random string and update the first name of the customer using a 3270 terminal
+        //Generate a random string and update the first name of the customer using the genapp-manager
         String provisionedName = genApp.provisionCustomerName();
         customer.updateFirstName(provisionedName);
+        customer.updateLastName(provisionedName);
 
         InetSocketAddress socket = container.getFirstSocketForExposedPort("8080/tcp");
         client.setURI(new URI("http://" + socket.getAddress().getHostName() + ":" + socket.getPort()));
@@ -74,7 +77,9 @@ public class ProvisionedHybridTest {
 
         //Ensure that the first name in the Json response is the updated value
         String webServiceFirstName = extractFromInquireJson(inquireResponseBody, "ca_first_name");
+        String webServiceLastName = extractFromInquireJson(inquireResponseBody, "ca_last_name");
         assertThat(webServiceFirstName).isEqualTo(customer.getFirstName());
+        assertThat(webServiceLastName).isEqualTo(customer.getLastName());
     }
 
     @Test
@@ -84,7 +89,7 @@ public class ProvisionedHybridTest {
         client.setURI(new URI("http://" + socket.getAddress().getHostName() + ":" + socket.getPort()));
         JsonObject addResponseBody = client.postJson("addcustomer?host=" + genApp.getAddress(), new JsonObject()).getContent();
 
-        //Retrieve the created customer data using a 3270 terminal
+        //Retrieve the created customer data using the genapp-manager
         int customerNumber = Integer.parseInt(addResponseBody.get("content").getAsString());
         ICustomer customer = genApp.inquireCustomer(customerNumber);
 

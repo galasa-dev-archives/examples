@@ -64,9 +64,11 @@ public class BasicHybridTest {
     @BasicGenApp
     public IBasicGenApp genApp;
 
+    // Docker image that contains a running Spring-instance that talks to the Genapp webservice
     @DockerContainer(image = "lukasmarivoet/genapp-spring:latest")
     public IDockerContainer container;
 
+    // Necessary to allow the Spring service to boot up and expose its 80 TCP port
     @BeforeClass
     public void waitForRestService() throws InterruptedException {
         Thread.sleep(5000);
@@ -80,14 +82,16 @@ public class BasicHybridTest {
 
         String defaultId = "0000000000";
 
+        // Adding an empty customer to the data so that we can retrieve its customer number
         JsonObject addResponseBody = client.postJson("addcustomer?host=" + genApp.getBaseAddress(), new JsonObject()).getContent();
         String customerId = addResponseBody.get("content").getAsString();
 
+        // Inquiring the specific customer through Spring that in turn calls towards the Genapp Web based instance
         JsonObject inquireResponseBody = client.postJson("inquirecustomer?host=" + genApp.getBaseAddress() + "&id=" + customerId , new JsonObject()).getContent();
         JsonObject ca = inquireResponseBody.get("LGICUS01OperationResponse").getAsJsonObject().get("ca")
                 .getAsJsonObject();
 
-        // Ensuring that the http-response actually contains user as requested
+        // Ensuring that the http-response actually contain an empty user as requested
         assertThat(ca.get("ca_first_name").getAsString()).isEqualTo("");
         assertThat(ca.get("ca_last_name").getAsString()).isEqualTo("");
 
@@ -96,6 +100,7 @@ public class BasicHybridTest {
 
         inquireCustomer(customerId);
 
+        // Updating the customer through 3270
         String updateProvisionedName = genApp.provisionCustomerName();
 
         terminal.positionCursorToFieldContaining("Cust Number").tab()
@@ -108,6 +113,7 @@ public class BasicHybridTest {
                 .type(updateProvisionedName)
                 .enter().waitForKeyboard();
 
+        // Inquiring through 3270
         inquireCustomer(customerId);
 
         assertThat(terminal.retrieveScreen()).contains(updateProvisionedName);
@@ -122,8 +128,7 @@ public class BasicHybridTest {
     }
 
     private void loginToSCC1() throws InterruptedException, CoreManagerException, Zos3270Exception {
-        // Retrieving the credentials that have the correct RACF-premissions to enter
-        // GenApp
+        // Retrieving the credentials that have the correct RACF-premissions to enter GenApp-region
         ICredentialsUsernamePassword creds = (ICredentialsUsernamePassword) coreManager.getCredentials("GENAPP");
         coreManager.registerConfidentialText(creds.getPassword(), creds.getUsername() + " password");
         // Logging into the CICS-region that has GenApp running on it
