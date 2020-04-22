@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.annotations.Component;
 
 import dev.galasa.ManagerException;
+import dev.galasa.docker.IDockerManager;
 import dev.galasa.framework.spi.AbstractManager;
 import dev.galasa.framework.spi.AnnotatedField;
 import dev.galasa.framework.spi.ConfigurationPropertyStoreException;
@@ -46,14 +47,23 @@ import dev.galasa.zos3270.spi.Zos3270TerminalImpl;
 /**
  * General application manager implementation.
  * 
- * Extracting from the test class the 6 current annotations of @GenApp, @Customer, @CommercialPolicy, @EndowmentPolicy, @HousePolicy and @MotorPolicy
+ * Extracting from the test class the 6 current annotations
+ * of @GenApp, @Customer, @CommercialPolicy, @EndowmentPolicy, @HousePolicy
+ * and @MotorPolicy
  * 
  * @GenApp - provides the actual environment that allows interaction with GenApp
- * @Customer - provides an Customer that can actually be used through an existing ID or a newly created customer
- * @CommercialPolicy - provides a CommercialPolicy in Genapp that can actually be used through an existing PolicyID or a newly created CommercialPolicy
- * @EndowmentPolicy - provides a EndowmentPolicy in Genapp that can actually be used through an existing PolicyID or a newly created EndowmentPolicy
- * @HousePolicy - provides a HousePolicy in Genapp that can actually be used through an existing PolicyID or a newly created CommercialPolicy
- * @MotorPolicy - provides a MotorPolicy in Genapp that can actually be used through an existing PolicyID or a newly created MotorPolicy
+ * @Customer - provides an Customer that can actually be used through an
+ *           existing ID or a newly created customer
+ * @CommercialPolicy - provides a CommercialPolicy in Genapp that can actually
+ *                   be used through an existing PolicyID or a newly created
+ *                   CommercialPolicy
+ * @EndowmentPolicy - provides a EndowmentPolicy in Genapp that can actually be
+ *                  used through an existing PolicyID or a newly created
+ *                  EndowmentPolicy
+ * @HousePolicy - provides a HousePolicy in Genapp that can actually be used
+ *              through an existing PolicyID or a newly created CommercialPolicy
+ * @MotorPolicy - provides a MotorPolicy in Genapp that can actually be used
+ *              through an existing PolicyID or a newly created MotorPolicy
  */
 @Component(service = { IManager.class })
 public class GenAppManagerImpl extends AbstractManager implements IGenAppManager {
@@ -102,7 +112,8 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
 
     @Override
     public boolean areYouProvisionalDependentOn(@NotNull IManager otherManager) {
-        if (otherManager instanceof IZosManager || otherManager instanceof IZos3270Manager) {
+        if (otherManager instanceof IZosManager || otherManager instanceof IZos3270Manager
+                || otherManager instanceof IDockerManager) {
             return true;
         }
 
@@ -128,6 +139,15 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
         generateAnnotatedFields(GenAppManagerField.class);
     }
 
+    @Override
+    public void startOfTestClass() throws GenAppManagerException {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new GenAppManagerException("Issue waiting in start of test method");
+        }
+    }
+
     public IGenApp generateGenApp(Field field, List<Annotation> annotations) throws GenAppManagerException {
         try {
             String dseInstance = GenAppDseInstance.get();
@@ -142,7 +162,7 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
             int telnetPort = image.getIpHost().getTelnetPort();
             Boolean tls = image.getIpHost().isTelnetPortTls();
 
-            Zos3270TerminalImpl terminal3270 = new Zos3270TerminalImpl("GenAppTerminal", host, telnetPort, tls, framework);
+            Zos3270TerminalImpl terminal3270 = new Zos3270TerminalImpl("GenAppTerminal", host, telnetPort, tls, framework, false);
             terminal3270.connect();
 
             GenAppImpl genApp = new GenAppImpl(terminal3270, applid, port, image, framework);

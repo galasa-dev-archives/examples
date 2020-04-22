@@ -57,12 +57,6 @@ public class ProvisionedHybridTest {
     @DockerContainer(image = "lukasmarivoet/genapp-spring:latest")
     public IDockerContainer container;
 
-    // Necessary to allow the Spring service to boot up and expose its 80 TCP port
-    @BeforeClass
-    public void waitForRestService() throws InterruptedException {
-        Thread.sleep(5000);
-    }
-
     @Test
     public void prosivionedAccountTest() throws GenAppManagerException, URISyntaxException, TestBundleResourceException,
             JsonSyntaxException, IOException, HttpClientException {
