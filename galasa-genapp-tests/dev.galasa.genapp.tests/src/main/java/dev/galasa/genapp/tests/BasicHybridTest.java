@@ -15,7 +15,6 @@ import java.net.URISyntaxException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
-import dev.galasa.BeforeClass;
 import dev.galasa.ICredentialsUsernamePassword;
 import dev.galasa.Test;
 import dev.galasa.artifact.BundleResources;

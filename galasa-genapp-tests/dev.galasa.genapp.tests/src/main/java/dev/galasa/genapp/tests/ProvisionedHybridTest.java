@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
-import dev.galasa.BeforeClass;
 import dev.galasa.Test;
 import dev.galasa.artifact.BundleResources;
 import dev.galasa.artifact.IBundleResources;
