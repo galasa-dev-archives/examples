@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dev.galasa</groupId>
+		<artifactId>galasa-genapptests-parent</artifactId>
+		<version>0.7.0-SNAPSHOT</version>
+	</parent>
+	
+	<name>Galasa GenApp Manager</name>
+
+	<artifactId>dev.galasa.genapp.manager</artifactId>
+	<!-- If updating version, reflect in dev.galasa.genapp.tests and dev.galasa.genapp.obr -->
+	<version>0.7.0-SNAPSHOT</version>
+	<packaging>bundle</packaging>
+
+	<dependencies>
+		<dependency>
+				<groupId>javax.validation</groupId>
+				<artifactId>validation-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.service.component.annotations</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>
