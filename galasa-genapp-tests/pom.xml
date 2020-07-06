@@ -3,7 +3,7 @@
 
 	<groupId>dev.galasa</groupId>
 	<artifactId>galasa-genapptests-parent</artifactId>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.10.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Galasa Sample GenApp Tests</name>
@@ -80,7 +80,7 @@
 			<dependency>
 				<groupId>dev.galasa</groupId>
 				<artifactId>galasa-bom</artifactId>
-				<version>0.7.0-SNAPSHOT</version>
+				<version>0.10.0-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -158,7 +158,7 @@
 				<plugin>
 					<groupId>dev.galasa</groupId>
 					<artifactId>galasa-maven-plugin</artifactId>
-					<version>0.7.0-SNAPSHOT</version>
+					<version>0.10.0-SNAPSHOT</version>
 				</plugin>
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>

@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>dev.galasa</groupId>
 		<artifactId>galasa-genapptests-parent</artifactId>
-		<version>0.7.0-SNAPSHOT</version>
+		<version>0.10.0-SNAPSHOT</version>
 	</parent>
 	
 	<name>Galasa GenApp Manager</name>
 
 	<artifactId>dev.galasa.genapp.manager</artifactId>
 	<!-- If updating version, reflect in dev.galasa.genapp.tests and dev.galasa.genapp.obr -->
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.10.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
 	<dependencies>

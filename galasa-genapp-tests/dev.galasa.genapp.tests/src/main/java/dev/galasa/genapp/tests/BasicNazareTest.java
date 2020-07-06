@@ -26,6 +26,7 @@ import dev.galasa.zos.ZosImage;
 import dev.galasa.zos3270.FieldNotFoundException;
 import dev.galasa.zos3270.ITerminal;
 import dev.galasa.zos3270.KeyboardLockedException;
+import dev.galasa.zos3270.TerminalInterruptedException;
 import dev.galasa.zos3270.TextNotFoundException;
 import dev.galasa.zos3270.TimeoutException;
 import dev.galasa.zos3270.Zos3270Exception;
@@ -38,7 +39,6 @@ public class BasicNazareTest {
     @CoreManager
     public ICoreManager coreManager;
 
-
     @ZosImage(imageTag = "GENAPP")
     public IZosImage image;
 
@@ -49,9 +49,8 @@ public class BasicNazareTest {
     public IBasicGenApp genApp;
 
     @Test
-    public void customer3270Update() throws CoreManagerException, InterruptedException, Zos3270Exception, TestBundleResourceException,
-            JsonSyntaxException, IOException, HttpClientException, URISyntaxException {
-
+    public void customer3270Update() throws CoreManagerException, Zos3270Exception,
+            TestBundleResourceException, JsonSyntaxException, IOException, HttpClientException, URISyntaxException {
 
         loginToSSC1();
 
@@ -61,29 +60,26 @@ public class BasicNazareTest {
 
         String updateProvisionedName = genApp.provisionCustomerName();
 
-        terminal.positionCursorToFieldContaining("Select Option").tab()
-                .type("4").enter().waitForKeyboard()
-                .positionCursorToFieldContaining("First").tab()
-                .type(updateProvisionedName)
-                .positionCursorToFieldContaining("Last").tab()
-                .type(updateProvisionedName)
-                .enter().waitForKeyboard();
+        terminal.positionCursorToFieldContaining("Select Option").tab().type("4").enter().waitForKeyboard()
+                .positionCursorToFieldContaining("First").tab().type(updateProvisionedName)
+                .positionCursorToFieldContaining("Last").tab().type(updateProvisionedName).enter().waitForKeyboard();
 
         inquireCustomer(customerId);
 
         assertThat(terminal.retrieveScreen()).contains(updateProvisionedName);
     }
 
-   private void loginToSSC1() throws InterruptedException, CoreManagerException, Zos3270Exception {
+    private void loginToSSC1() throws CoreManagerException, Zos3270Exception {
         if (terminal.waitForKeyboard().retrieveScreen().contains("VAMP")) {
             ICredentialsUsernamePassword creds = (ICredentialsUsernamePassword) coreManager.getCredentials("GENAPP");
             coreManager.registerConfidentialText(creds.getPassword(), creds.getUsername() + " password");
 
-            terminal.waitForKeyboard().type("logon applid(" + genApp.getApplId() + ")").enter().waitForTextInField("Userid").pf3()
-                    .waitForTextInField("Sign-on is terminated").clear().waitForKeyboard().type("cesl").enter()
-                    .waitForTextInField("Userid").positionCursorToFieldContaining("Userid").tab().type(creds.getUsername())
-                    .positionCursorToFieldContaining("Password").tab().type(creds.getPassword()).enter().waitForKeyboard()
-                    .clear().waitForKeyboard().type("ssc1").enter().waitForKeyboard();
+            terminal.waitForKeyboard().type("logon applid(" + genApp.getApplId() + ")").enter()
+                    .waitForTextInField("Userid").pf3().waitForTextInField("Sign-on is terminated").clear()
+                    .waitForKeyboard().type("cesl").enter().waitForTextInField("Userid")
+                    .positionCursorToFieldContaining("Userid").tab().type(creds.getUsername())
+                    .positionCursorToFieldContaining("Password").tab().type(creds.getPassword()).enter()
+                    .waitForKeyboard().clear().waitForKeyboard().type("ssc1").enter().waitForKeyboard();
         } else {
             terminal.waitForKeyboard().type("logon applid(" + genApp.getApplId() + ")").enter().waitForKeyboard()
                     .clear().waitForKeyboard().type("ssc1").enter().waitForKeyboard();
@@ -91,7 +87,7 @@ public class BasicNazareTest {
     }
 
     private void inquireCustomer(String customerId) throws TimeoutException, KeyboardLockedException, NetworkException,
-            FieldNotFoundException, TextNotFoundException, InterruptedException {
+            FieldNotFoundException, TextNotFoundException, TerminalInterruptedException {
         String defaultId = "0000000000";
 
         terminal.positionCursorToFieldContaining("Cust Number").tab()
@@ -102,7 +98,7 @@ public class BasicNazareTest {
 
 
     private String addCustomer() throws TimeoutException, KeyboardLockedException, NetworkException,
-            FieldNotFoundException, TextNotFoundException, InterruptedException {
+            FieldNotFoundException, TextNotFoundException, TerminalInterruptedException {
 
         terminal.waitForKeyboard()
                 .positionCursorToFieldContaining("Select Option").tab()

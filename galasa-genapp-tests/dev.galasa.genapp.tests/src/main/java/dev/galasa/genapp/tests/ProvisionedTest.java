@@ -20,12 +20,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
+import org.apache.commons.logging.Log;
+
 import dev.galasa.ResultArchiveStoreContentType;
 import dev.galasa.SetContentType;
 import dev.galasa.Test;
 import dev.galasa.artifact.BundleResources;
 import dev.galasa.artifact.IBundleResources;
 import dev.galasa.artifact.TestBundleResourceException;
+import dev.galasa.core.manager.Logger;
 import dev.galasa.core.manager.StoredArtifactRoot;
 import dev.galasa.genapp.manager.AreasTested;
 import dev.galasa.genapp.manager.Customer;
@@ -40,6 +43,9 @@ import dev.galasa.http.IHttpClient;
 @Test
 @AreasTested(areas = {"customer"})
 public class ProvisionedTest {
+
+    @Logger
+    Log logger;
 
     @GenApp
     public IGenApp genApp;

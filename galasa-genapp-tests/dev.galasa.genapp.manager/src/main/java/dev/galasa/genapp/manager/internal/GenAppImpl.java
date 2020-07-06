@@ -17,6 +17,7 @@ import dev.galasa.zos.ZosManagerException;
 import dev.galasa.zos3270.FieldNotFoundException;
 import dev.galasa.zos3270.ITerminal;
 import dev.galasa.zos3270.KeyboardLockedException;
+import dev.galasa.zos3270.TerminalInterruptedException;
 import dev.galasa.zos3270.TextNotFoundException;
 import dev.galasa.zos3270.TimeoutException;
 import dev.galasa.zos3270.Zos3270Exception;
@@ -313,7 +314,8 @@ public class GenAppImpl implements IGenApp {
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
 
             if (terminal.retrieveScreen().contains("Policy Inserted"))
-                return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities, managedFunds);
+                return new EndowmentPolicyImpl(customer, policyNumber, fundName, lifeAssured, withProfits, equities,
+                        managedFunds);
             else
                 return null;
         } catch (InterruptedException | Zos3270Exception e) {
@@ -427,7 +429,7 @@ public class GenAppImpl implements IGenApp {
             fillField("Customer Name", customerName, ' ');
             fillField("Status", status, ' ');
             terminal.positionCursorToFieldContaining("Select Option").tab().type("2").enter().waitForKeyboard();
-            
+
             if (terminal.retrieveScreen().contains("Policy Inserted"))
                 return new CommercialPolicyImpl(customer, policyNumber, postcode, customerName, status);
             else
@@ -446,30 +448,29 @@ public class GenAppImpl implements IGenApp {
     private void logon() throws GenAppManagerException {
         try {
             terminal.waitForKeyboard();
-            if(terminal.retrieveScreen().contains("VAMP")) {
+            if (terminal.retrieveScreen().contains("VAMP")) {
                 terminal.type("logon applid(" + this.applID + ")").enter();
-                if(!terminal.retrieveScreen().contains(this.applID + " FAILED")) {
-                    terminal.waitForTextInField("Userid")
-                        .pf3().waitForTextInField("Sign-on is terminated").clear().waitForKeyboard().type("cesl").enter()
-                        .waitForTextInField("Userid").positionCursorToFieldContaining("Userid").tab()
-                        .type(creds.getUsername()).positionCursorToFieldContaining("Password").tab()
-                        .type(creds.getPassword()).enter().waitForKeyboard().clear().waitForKeyboard();
-                }else {
+                if (!terminal.retrieveScreen().contains(this.applID + " FAILED")) {
+                    terminal.waitForTextInField("Userid").pf3().waitForTextInField("Sign-on is terminated").clear()
+                            .waitForKeyboard().type("cesl").enter().waitForTextInField("Userid")
+                            .positionCursorToFieldContaining("Userid").tab().type(creds.getUsername())
+                            .positionCursorToFieldContaining("Password").tab().type(creds.getPassword()).enter()
+                            .waitForKeyboard().clear().waitForKeyboard();
+                } else {
                     throw new GenAppManagerException("Failed to logon to " + this.applID);
                 }
-            } else if(terminal.retrieveScreen().contains("LOGON APPLID()")) {
-                terminal.type("logon applid(" + this.applID + ")").enter()
-                        .waitForKeyboard().clear().waitForKeyboard();
+            } else if (terminal.retrieveScreen().contains("LOGON APPLID()")) {
+                terminal.type("logon applid(" + this.applID + ")").enter().waitForKeyboard().clear().waitForKeyboard();
             } else {
                 throw new GenAppManagerException("Login type not supported");
             }
-        } catch (InterruptedException | Zos3270Exception e) {
+        } catch (Zos3270Exception e) {
             throw new GenAppManagerException("Issue logging into GenApp", e);
         }
     }
 
     private void navigateTo(String transaction) throws TimeoutException, KeyboardLockedException, NetworkException,
-            FieldNotFoundException, InterruptedException {
+            FieldNotFoundException, InterruptedException, TerminalInterruptedException {
         if(terminal.retrieveScreen().contains(transaction.toUpperCase()))
             return;
 
