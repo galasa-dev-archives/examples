@@ -20,6 +20,7 @@ import dev.galasa.framework.spi.IConfigurationPropertyStoreService;
 import dev.galasa.framework.spi.IFramework;
 import dev.galasa.framework.spi.IManager;
 import dev.galasa.framework.spi.ResourceUnavailableException;
+import dev.galasa.framework.spi.language.GalasaTest;
 import dev.galasa.genapp.manager.BasicGenApp;
 import dev.galasa.genapp.manager.Customer;
 import dev.galasa.genapp.manager.GenApp;
@@ -39,6 +40,7 @@ import dev.galasa.zos.IZosManager;
 import dev.galasa.zos.ZosManagerException;
 import dev.galasa.zos.spi.IZosManagerSpi;
 import dev.galasa.zos3270.IZos3270Manager;
+import dev.galasa.zos3270.TerminalInterruptedException;
 import dev.galasa.zos3270.Zos3270ManagerException;
 import dev.galasa.zos3270.spi.IZos3270ManagerSpi;
 import dev.galasa.zos3270.spi.NetworkException;
@@ -81,11 +83,14 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
 
     @Override
     public void initialise(@NotNull IFramework framework, @NotNull List<IManager> allManagers,
-            @NotNull List<IManager> activeManagers, @NotNull Class<?> testClass) throws ManagerException {
-        super.initialise(framework, allManagers, activeManagers, testClass);
-        List<AnnotatedField> ourFields = findAnnotatedFields(GenAppManagerField.class);
-        if (!ourFields.isEmpty()) {
-            youAreRequired(allManagers, activeManagers);
+            @NotNull List<IManager> activeManagers, @NotNull GalasaTest galasaTest) throws ManagerException {
+        super.initialise(framework, allManagers, activeManagers, galasaTest);
+
+        if(galasaTest.isJava()) {
+            List<AnnotatedField> ourFields = findAnnotatedFields(GenAppManagerField.class);
+            if (!ourFields.isEmpty()) {
+                youAreRequired(allManagers, activeManagers);
+            }
         }
 
         try {
@@ -162,14 +167,15 @@ public class GenAppManagerImpl extends AbstractManager implements IGenAppManager
             int telnetPort = image.getIpHost().getTelnetPort();
             Boolean tls = image.getIpHost().isTelnetPortTls();
 
-            Zos3270TerminalImpl terminal3270 = new Zos3270TerminalImpl("GenAppTerminal", host, telnetPort, tls, framework, false);
+            Zos3270TerminalImpl terminal3270 = new Zos3270TerminalImpl("GenAppTerminal", host, telnetPort, tls,
+                    framework, false);
             terminal3270.connect();
 
             GenAppImpl genApp = new GenAppImpl(terminal3270, applid, port, image, framework);
             this.genapp = genApp;
             return genApp;
-        } catch (Zos3270ManagerException | InterruptedException | IpNetworkManagerException | ZosManagerException
-                | ConfigurationPropertyStoreException | NetworkException e) {
+        } catch (Zos3270ManagerException | IpNetworkManagerException | ZosManagerException
+                | ConfigurationPropertyStoreException | NetworkException | TerminalInterruptedException e) {
             throw new GenAppManagerException("Issue generating sources for GenApp instance", e);
         }
     }
